@@ -1,0 +1,6 @@
+server:
+  port: 29091
+
+spring:
+  profiles:
+    active: dev

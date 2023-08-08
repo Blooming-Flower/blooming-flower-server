@@ -1,0 +1,32 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  h2:
+   console:
+     enabled: true
+     path: /h2-console
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password: 
+
+logging:
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 7
+  level:
+    root: INFO
+    kr.co.flower.blooming: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [%4L] - %m%n"
+    file: "[%d{HH:mm:ss.SSS}][%-5level][%t][%logger.%method:line%line] - %msg%n"
+  file:
+    name: "/tmp/logs/blooming-flower-server-dev.log"
