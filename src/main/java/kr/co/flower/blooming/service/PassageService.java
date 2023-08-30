@@ -1,12 +1,9 @@
 package kr.co.flower.blooming.service;
 
-import java.util.List;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 import kr.co.flower.blooming.dto.in.PassageRegistDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.entity.PassageEntity;

@@ -1,4 +1,4 @@
-package kr.co.flower.blooming.question.repository;
+package kr.co.flower.blooming.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
@@ -14,11 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import kr.co.flower.blooming.config.TestQueryDSLConfig;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
-import kr.co.flower.blooming.question.config.TestQueryDSLConfig;
-import kr.co.flower.blooming.repository.PassageRepository;
 
 @ActiveProfiles("test")
 @Import(TestQueryDSLConfig.class)
@@ -32,27 +31,27 @@ public class PassageRepositoryTest {
     @Test
     @DisplayName("동적 검색 TEST")
     void findPassageAllTest() {
-        //        select
-        //        passageent0_.passage_type as col_0_0_,
-        //        passageent0_.passage_name as col_1_0_,
-        //        passageent0_.passage_unit as col_2_0_,
-        //        passageent0_.passage_number as col_3_0_,
-        //        (select
-        //            count(questionen1_.question_id) 
-        //        from
-        //            question questionen1_ 
-        //        where
-        //            passageent0_.passage_id = questionen1_.question_id) as col_4_0_ 
-        //    from
-        //        passage passageent0_ 
-        //    where
-        //        passageent0_.passage_year=? 
-        //        and (
-        //            passageent0_.passage_name like ? escape '!'
-        //        ) 
-        //    order by
-        //        passageent0_.passage_name desc,
-        //        passageent0_.passage_unit asc limit ?
+        // select
+        // passageent0_.passage_type as col_0_0_,
+        // passageent0_.passage_name as col_1_0_,
+        // passageent0_.passage_unit as col_2_0_,
+        // passageent0_.passage_number as col_3_0_,
+        // (select
+        // count(questionen1_.question_id)
+        // from
+        // question questionen1_
+        // where
+        // passageent0_.passage_id = questionen1_.question_id) as col_4_0_
+        // from
+        // passage passageent0_
+        // where
+        // passageent0_.passage_year=?
+        // and (
+        // passageent0_.passage_name like ? escape '!'
+        // )
+        // order by
+        // passageent0_.passage_name desc,
+        // passageent0_.passage_unit asc limit ?
 
         // given
         passageSave();

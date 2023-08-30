@@ -2,8 +2,10 @@ package kr.co.flower.blooming.dto.in;
 
 import kr.co.flower.blooming.entity.PassageType;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class PassageRegistDto {
     private long passageId;
     private PassageType passageType; // 교재 종류

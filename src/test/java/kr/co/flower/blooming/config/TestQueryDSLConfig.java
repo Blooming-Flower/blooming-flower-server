@@ -1,16 +1,16 @@
-package kr.co.flower.blooming.question.config;
+package kr.co.flower.blooming.config;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 /**
  * queryDSL을 사용하기 위한 config
  */
-@Configuration
+@TestConfiguration
 @ActiveProfiles("test")
 public class TestQueryDSLConfig {
 
