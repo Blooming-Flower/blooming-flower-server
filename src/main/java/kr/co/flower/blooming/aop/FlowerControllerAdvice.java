@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FlowerControllerAdvice {
     @ExceptionHandler(FlowerException.class)
     public ResponseEntity<?> feignException(FlowerException e) {
-        log.error("SchedulerException occur :: {}", e.getFlowerError().getMessage());
+        log.error("Flower Server Exception occur :: {}", e.getFlowerError().getMessage());
         return new ResponseEntity<>(FlowerErrorDto.createErrorDto(e.getFlowerError()),
                 e.getFlowerError().getHttpStatus());
     }
