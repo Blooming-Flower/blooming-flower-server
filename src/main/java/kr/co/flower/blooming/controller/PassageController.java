@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class PassageController {
     private final PassageService passageService;
 
-    @Operation(description = "지문 저장")
+    @Operation(description = "지문 저장", summary = "지문 저장")
     @PostMapping(path = "/save")
     public ResponseEntity<?> savePassage(@RequestBody PassageRegistDto passageRegistDto) {
         passageService.savePassage(passageRegistDto);
@@ -40,7 +40,7 @@ public class PassageController {
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")
     })
-    @Operation(description = "지문 수정")
+    @Operation(description = "지문 수정", summary = "지문 수정")
     @PutMapping(path = "/update")
     public ResponseEntity<?> updatePassage(@RequestBody PassageRegistDto passageRegistDto) {
         passageService.updatePassage(passageRegistDto);
@@ -50,7 +50,7 @@ public class PassageController {
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")
     })
-    @Operation(description = "지문 삭제")
+    @Operation(description = "지문 삭제", summary = "지문 삭제")
     @DeleteMapping(path = "/delete/{passageId}")
     public ResponseEntity<?> deletePassage(@PathVariable(name = "passageId") long passageId) {
         passageService.deletePassage(passageId);
@@ -60,7 +60,7 @@ public class PassageController {
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")
     })
-    @Operation(description = "지문 단건 조회")
+    @Operation(description = "지문 단건 조회", summary = "지문 단건 조회")
     @GetMapping(path = "/find/{passageId}")
     public ResponseEntity<?> findPassage(@PathVariable(name = "passageId") long passageId) {
         PassageEntity passage = passageService.findPassage(passageId);
@@ -70,7 +70,7 @@ public class PassageController {
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")
     })
-    @Operation(description = "검색 조건 & 정렬 순으로 지문 목록 조회")
+    @Operation(description = "검색 조건 & 정렬 순으로 지문 목록 조회", summary = "검색 조건 & 정렬 순으로 지문 목록 조회")
     @GetMapping(path = "/find/list")
     public ResponseEntity<?> findListPassage(Pageable pageable,
             @RequestParam(required = false) PassageType passageType,

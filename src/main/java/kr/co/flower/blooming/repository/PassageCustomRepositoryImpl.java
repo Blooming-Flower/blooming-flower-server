@@ -61,6 +61,7 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
                 .select(new QPassageListDto(passageEntity.passageType, passageEntity.passageName,
                         passageEntity.passageUnit, passageEntity.passageNumber,
                         passageEntity.questionEntities.size()))
+                .from(passageEntity)
                 .where(getPredicateOfWhere(passageType, passageYear, passageName, passageUnit,
                         passageNumber))
                 .offset(pageable.getOffset())
