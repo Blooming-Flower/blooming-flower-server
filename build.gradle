@@ -41,7 +41,16 @@ dependencies {
 	
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+	
+	// quartz
+	implementation 'org.springframework.boot:spring-boot-starter-quartz'
     
+    // cron utils
+	// https://github.com/jmrozanec/cron-utils
+	implementation 'com.cronutils:cron-utils:9.2.1'
+    
+    // batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
 	
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
