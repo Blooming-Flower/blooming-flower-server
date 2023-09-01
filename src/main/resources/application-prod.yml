@@ -1,6 +1,6 @@
 flower:
   backup:
-    hour: ${BACKUP_HOUR:02:00}
+    hour: ${BACKUP_HOUR:02}
     minute: ${BACKUP_MINUTE:00}
     second: ${BACKUP_SECOND:00}
     
