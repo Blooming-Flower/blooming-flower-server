@@ -44,7 +44,7 @@ public class PassageEntity extends BaseEntity {
     private String passageName; // 교재 이름
 
     @Column(nullable = false)
-    private String passageUnit; // UNIT
+    private String passageUnit; // 강
 
     @Column(nullable = false)
     private String passageNumber; // 지문 번호
