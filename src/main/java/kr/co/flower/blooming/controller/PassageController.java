@@ -1,5 +1,7 @@
 package kr.co.flower.blooming.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,7 @@ public class PassageController {
 
     @Operation(description = "지문 저장", summary = "지문 저장")
     @PostMapping(path = "/save")
-    public ResponseEntity<?> savePassage(@RequestBody PassageRegistDto passageRegistDto) {
+    public ResponseEntity<?> savePassage(@RequestBody @Valid PassageRegistDto passageRegistDto) {
         passageService.savePassage(passageRegistDto);
         return ResponseEntity.ok().build();
     }
@@ -42,7 +44,7 @@ public class PassageController {
     })
     @Operation(description = "지문 수정", summary = "지문 수정")
     @PutMapping(path = "/update")
-    public ResponseEntity<?> updatePassage(@RequestBody PassageRegistDto passageRegistDto) {
+    public ResponseEntity<?> updatePassage(@RequestBody @Valid PassageRegistDto passageRegistDto) {
         passageService.updatePassage(passageRegistDto);
         return ResponseEntity.ok().build();
     }
