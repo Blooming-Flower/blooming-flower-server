@@ -2,6 +2,8 @@ package kr.co.flower.blooming.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -64,7 +66,7 @@ public class QuestionEntity extends BaseEntity {
 			chooseEntity.setChooseContent(dto.getChooseContent());
 
 			return chooseEntity;
-		}).toList();
+		}).collect(Collectors.toList());
 
 		this.chooseEntities.clear();
 		this.chooseEntities.addAll(chooseList);
