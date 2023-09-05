@@ -7,7 +7,7 @@ on:
 env:
   EC2_HOST: ${{ secrets.BLOOMING_FLOWER_HOST }}
   SERVICE_HOME: ${{ secrets.BLOOMING_FLOWER_HOME }}
-  SCRIPT: ${{SERVICE_HOME}}/shell/blooming-flower-deploy.sh
+  SCRIPT: ${{SERVICE_HOME/shell/blooming-flower-deploy.sh}}
   
 permissions:
   contents: read
