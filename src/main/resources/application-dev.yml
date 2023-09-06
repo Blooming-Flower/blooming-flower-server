@@ -23,7 +23,7 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 10
+            threadCount: 3
             threadPriority: 5
             threadsInheritContextClassLoaderOfInitializingThread: true
   jpa:
@@ -32,7 +32,7 @@ spring:
         show_sql: true
         format_sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     open-in-view: false
   h2:
    console:

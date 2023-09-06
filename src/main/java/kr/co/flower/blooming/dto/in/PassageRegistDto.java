@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class PassageRegistDto {
     private long passageId;
-    @NotBlank
+
     private PassageType passageType; // 교재 종류
     
     @NotBlank

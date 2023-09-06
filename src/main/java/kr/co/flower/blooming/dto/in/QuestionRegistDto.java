@@ -14,7 +14,6 @@ import lombok.Setter;
 public class QuestionRegistDto {
 	private long questionId;
 
-	@NotBlank
 	private QuestionType questionType; // 유형
 
 	@NotBlank

@@ -1,7 +1,5 @@
 server:
   port: 29091
-  error:
-    include-message: always
     
 spring:
   profiles:

@@ -23,7 +23,7 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 10
+            threadCount: 3
             threadPriority: 5
             threadsInheritContextClassLoaderOfInitializingThread: true
   jpa:

@@ -11,10 +11,13 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.dto.out.QPassageListDto;
 import kr.co.flower.blooming.entity.PassageType;
+import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
 import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
 import lombok.RequiredArgsConstructor;
 
@@ -53,14 +56,17 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
      * @param passageName
      * @param passageUnit
      * @param passageNumber
-     * @return
+     * @return passageEntity.questionEntities.size()
      */
     private List<PassageListDto> getPassageListDto(Pageable pageable, PassageType passageType,
             String passageYear, String passageName, String passageUnit, String passageNumber) {
         return queryFactory
                 .select(new QPassageListDto(passageEntity.passageType, passageEntity.passageName,
                         passageEntity.passageUnit, passageEntity.passageNumber,
-                        passageEntity.questionEntities.size()))
+                        JPAExpressions.select(questionEntity.count())
+                        .from(questionEntity)
+                        .where(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
+                        ))
                 .from(passageEntity)
                 .where(getPredicateOfWhere(passageType, passageYear, passageName, passageUnit,
                         passageNumber))
