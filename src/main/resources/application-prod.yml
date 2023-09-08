@@ -27,4 +27,4 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [%4L] - %m%n"
     file: "[%d{HH:mm:ss.SSS}][%-5level][%t][%logger.%method:line%line] - %msg%n"
   file:
-    name: "/home/ec2-user/deploy/blooming-flower-server/logs/blooming-flower-server-prod.log"
+    name: "${BLOOMING_FLOWER_HOME:/tmp}/logs/blooming-flower-server.log"
