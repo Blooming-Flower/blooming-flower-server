@@ -84,7 +84,7 @@ public class PassageService {
      * @param pageRequest
      * @return
      */
-    public Page<PassageListDto> findPassageAll(Pageable pageable, PassageType passageType,
+    public Page<PassageListDto> searchPassageList(Pageable pageable, PassageType passageType,
             String passageYear, String passageName, String passageUnit, String passageNumber) {
         return passageRepository.findPassageAll(pageable, passageType, passageYear, passageName,
                 passageUnit, passageNumber);

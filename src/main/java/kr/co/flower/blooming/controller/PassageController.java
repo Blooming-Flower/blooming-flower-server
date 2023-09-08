@@ -73,14 +73,14 @@ public class PassageController {
             @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")
     })
     @Operation(description = "검색 조건 & 정렬 순으로 지문 목록 조회", summary = "검색 조건 & 정렬 순으로 지문 목록 조회")
-    @GetMapping(path = "/find/list")
-    public ResponseEntity<?> findListPassage(Pageable pageable,
+    @GetMapping(path = "/search/list")
+    public ResponseEntity<?> searchListPassage(Pageable pageable,
             @RequestParam(required = false) PassageType passageType,
             @RequestParam(required = false) String passageYear,
             @RequestParam(required = false) String passageName,
             @RequestParam(required = false) String passageUnit,
             @RequestParam(required = false) String passageNumber) {
-        Page<PassageListDto> passageList = passageService.findPassageAll(pageable, passageType,
+        Page<PassageListDto> passageList = passageService.searchPassageList(pageable, passageType,
                 passageYear, passageName, passageUnit, passageNumber);
         return ResponseEntity.ok(passageList);
     }
