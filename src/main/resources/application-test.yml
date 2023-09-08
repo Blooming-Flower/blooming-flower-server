@@ -1,31 +1,5 @@
-flower:
-  backup:
-    hour: ${BACKUP_HOUR:02}
-    minute: ${BACKUP_MINUTE:00}
-    second: ${BACKUP_SECOND:00}
-    
 spring:
-  # Batch
-  batch:
-    job:
-      names: ${job.name:NONE}
-      enabled: false
-    jdbc:
-      initialize-schema: always
-  # Quartz
-  quartz:
-    scheduler-name: QuartzScheduler
-    job-store-type: jdbc
-    jdbc:
-      initialize-schema: always
-    overwrite-existing-jobs: true
-    properties:
-      org:
-        quartz:
-          threadPool:
-            threadCount: 3
-            threadPriority: 5
-            threadsInheritContextClassLoaderOfInitializingThread: true
+ 
   jpa:
     properties:
       hibernate:
