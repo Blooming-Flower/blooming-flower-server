@@ -9,7 +9,7 @@ import kr.co.flower.blooming.dto.in.QuestionRegistDto;
 import kr.co.flower.blooming.dto.in.QuestionRegistDto.QuestionDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.QuestionEntity;
-import kr.co.flower.blooming.entity.QuestionPassageEntity;
+import kr.co.flower.blooming.entity.QuestionContentEntity;
 import kr.co.flower.blooming.entity.QuestionPassageRepository;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
@@ -71,7 +71,7 @@ public class QuestionService {
 	}
 
 	private void setQuestionEntity(QuestionEntity questionEntity, QuestionRegistDto questionRegistDto) {
-		QuestionPassageEntity questionPassageEntity = new QuestionPassageEntity();
+		QuestionContentEntity questionPassageEntity = new QuestionContentEntity();
 		questionPassageEntity.setQuestionContent(questionRegistDto.getQuestionContent());
 		questionPassageRepository.save(questionPassageEntity);
 

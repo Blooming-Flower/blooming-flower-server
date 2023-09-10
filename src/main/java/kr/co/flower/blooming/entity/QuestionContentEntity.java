@@ -18,9 +18,9 @@ import lombok.Data;
  *
  */
 @Entity
-@Table(name = "QUESTION")
+@Table(name = "QUESTION_Content")
 @Data
-public class QuestionPassageEntity {
+public class QuestionContentEntity {
 	@Id
 	@GeneratedValue
 	private long questionPassageId;

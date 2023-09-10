@@ -57,8 +57,8 @@ public class QuestionEntity extends BaseEntity {
 	private PassageEntity passageEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "question_passage_id")
-	private QuestionPassageEntity questionPassageEntity;
+	@JoinColumn(name = "question_content_id")
+	private QuestionContentEntity questionPassageEntity;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "question_id")
