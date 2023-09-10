@@ -18,7 +18,7 @@ import lombok.Data;
  *
  */
 @Entity
-@Table(name = "QUESTION_Content")
+@Table(name = "QUESTION_CONTENT")
 @Data
 public class QuestionContentEntity {
 	@Id
