@@ -23,62 +23,59 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class QuestionService {
-    private final QuestionRepository questionRepository;
-    private final PassageRepository passageRepository;
+	private final QuestionRepository questionRepository;
+	private final PassageRepository passageRepository;
 
-    /**
-     * 문제 저장
-     * 
-     * @param questionRegistDto
-     */
-    @Transactional
-    public void saveQuestion(QuestionRegistDto questionRegistDto) {
-        QuestionEntity questionEntity = new QuestionEntity();
+	/**
+	 * 문제 저장
+	 * 
+	 * @param questionRegistDto
+	 */
+	@Transactional
+	public void saveQuestion(QuestionRegistDto questionRegistDto) {
+		QuestionEntity questionEntity = new QuestionEntity();
 
-        setQuestionEntity(questionEntity, questionRegistDto);
+		setQuestionEntity(questionEntity, questionRegistDto);
 
-        questionRepository.save(questionEntity);
-    }
+		questionRepository.save(questionEntity);
+	}
 
-    /**
-     * 문제 수정
-     * 
-     * @param questionRegistDto
-     */
-    @Transactional
-    public void updateQuestion(QuestionRegistDto questionRegistDto) {
-        QuestionEntity questionEntity =
-                questionRepository.findById(questionRegistDto.getQuestionId())
-                        .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+	/**
+	 * 문제 수정
+	 * 
+	 * @param questionRegistDto
+	 */
+	@Transactional
+	public void updateQuestion(QuestionRegistDto questionRegistDto) {
+		QuestionEntity questionEntity = questionRepository.findById(questionRegistDto.getQuestionId())
+				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-        setQuestionEntity(questionEntity, questionRegistDto);
-    }
+		setQuestionEntity(questionEntity, questionRegistDto);
+	}
 
-    /**
-     * 문제 삭제
-     * 
-     * @param questionId
-     */
-    @Transactional
-    public void deleteQuestion(long questionId) {
-        questionRepository.findById(questionId)
-                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+	/**
+	 * 문제 삭제
+	 * 
+	 * @param questionId
+	 */
+	@Transactional
+	public void deleteQuestion(long questionId) {
+		questionRepository.findById(questionId).orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-        questionRepository.deleteById(questionId);
-    }
+		questionRepository.deleteById(questionId);
+	}
 
-    private void setQuestionEntity(QuestionEntity questionEntity,
-            QuestionRegistDto questionRegistDto) {
-        questionEntity.setQuestionType(questionRegistDto.getQuestionType());
-        questionEntity.setQuestionTitle(questionRegistDto.getQuestionTitle());
-        questionEntity.setQuestionContent(questionRegistDto.getQuestionContent());
-        questionEntity.setQuestionAnswer(questionRegistDto.getQuestionAnswer());
-        questionEntity.setPastYn(questionRegistDto.isPastYn());
-        questionEntity.setChooseEntities(questionRegistDto.getChooseList());
+	private void setQuestionEntity(QuestionEntity questionEntity, QuestionRegistDto questionRegistDto) {
+		questionEntity.setQuestionType(questionRegistDto.getQuestionType());
+		questionEntity.setQuestionTitle(questionRegistDto.getQuestionTitle());
+		questionEntity.setQuestionContent(questionRegistDto.getQuestionContent());
+		questionEntity.setAnswerEntities(questionRegistDto.getAnswerList());
+		questionEntity.setPastYn(questionRegistDto.isPastYn());
+		questionEntity.setChooseEntities(questionRegistDto.getChooseList());
 
-        PassageEntity passage = passageRepository.findById(questionRegistDto.getPassageId())
-                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+		PassageEntity passage = passageRepository.findById(questionRegistDto.getPassageId())
+				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-        questionEntity.setPassageEntity(passage);
-    }
+		questionEntity.setPassageEntity(passage);
+	}
 }

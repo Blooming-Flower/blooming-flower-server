@@ -65,8 +65,7 @@ public class PassageRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10, sort);
 
         // when
-        Page<PassageListDto> passageList =
-                passageRepository.findPassageAll(pageable, null, "2023", "테스트", null, null);
+		Page<PassageListDto> passageList = passageRepository.findPassageAll(pageable, "2023", "테스트");
 
         // then
         List<PassageListDto> content = passageList.getContent();

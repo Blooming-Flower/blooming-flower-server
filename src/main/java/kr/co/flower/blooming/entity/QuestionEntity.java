@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import kr.co.flower.blooming.dto.in.AnswerDto;
 import kr.co.flower.blooming.dto.in.ChooseDto;
 import lombok.Data;
 
@@ -31,46 +32,63 @@ import lombok.Data;
 @Table(name = "QUESTION")
 @Data
 public class QuestionEntity extends BaseEntity {
-    @Id
-    @GeneratedValue
-    private long questionId;
+	@Id
+	@GeneratedValue
+	private long questionId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private QuestionType questionType; // 유형
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private QuestionType questionType; // 유형
 
-    @Column(nullable = false)
-    private String questionTitle; // 발문
+	@Column(nullable = false)
+	private String questionTitle; // 발문
 
-    @Lob
-    @Column(nullable = false)
-    private String questionContent; // 지문
+	@Lob
+	@Column(nullable = false)
+	private String questionContent; // 지문
 
-    @Column(nullable = false)
-    private String questionAnswer; // 정답
+	private boolean pastYn; // 기출 여부
 
-    private boolean pastYn; // 기출 여부
+	private boolean saveYn; // 실제 저장 여부
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "passage_id")
-    private PassageEntity passageEntity;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "passage_id")
+	private PassageEntity passageEntity;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "question_id")
-    private List<ChooseEntity> chooseEntities = new ArrayList<>();
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "question_id")
+	private List<ChooseEntity> chooseEntities = new ArrayList<>();
 
-    public void setChooseEntities(List<ChooseDto> chooseDtos) {
-        List<ChooseEntity> chooseList = chooseDtos.stream().map(dto -> {
-            ChooseEntity chooseEntity = new ChooseEntity();
-            chooseEntity.setChooseSeq(dto.getChooseSeq());
-            chooseEntity.setChooseContent(dto.getChooseContent());
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "question_id")
+	private List<AnswerEntity> answerEntities = new ArrayList<>();
 
-            return chooseEntity;
-        }).collect(Collectors.toList());
+	public void setChooseEntities(List<ChooseDto> chooseDtos) {
+		List<ChooseEntity> chooseList = chooseDtos.stream().map(dto -> {
+			ChooseEntity chooseEntity = new ChooseEntity();
+			chooseEntity.setChooseSeq(dto.getChooseSeq());
+			chooseEntity.setChooseContent(dto.getChooseContent());
 
-        this.chooseEntities.clear();
-        if (!chooseList.isEmpty()) {
-            this.chooseEntities.addAll(chooseList);
-        }
-    }
+			return chooseEntity;
+		}).collect(Collectors.toList());
+
+		this.chooseEntities.clear();
+		if (!chooseList.isEmpty()) {
+			this.chooseEntities.addAll(chooseList);
+		}
+	}
+
+	public void setAnswerEntities(List<AnswerDto> answerDtos) {
+		List<AnswerEntity> answerList = answerDtos.stream().map(dto -> {
+			AnswerEntity answerEntity = new AnswerEntity();
+			answerEntity.setAnswerContent(dto.getAnswerContent());
+
+			return answerEntity;
+		}).collect(Collectors.toList());
+
+		this.answerEntities.clear();
+		if (!answerList.isEmpty()) {
+			this.answerEntities.addAll(answerList);
+		}
+	}
 }

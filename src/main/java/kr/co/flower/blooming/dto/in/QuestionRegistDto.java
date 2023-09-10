@@ -31,4 +31,6 @@ public class QuestionRegistDto {
 
 	private List<ChooseDto> chooseList = new ArrayList<>();
 
+	private List<AnswerDto> answerList = new ArrayList<>();
+
 }
