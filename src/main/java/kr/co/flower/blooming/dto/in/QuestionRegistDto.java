@@ -14,23 +14,28 @@ import lombok.Setter;
 public class QuestionRegistDto {
 	private long questionId;
 
-	private QuestionType questionType; // 유형
-
-	@NotBlank
-	private String questionTitle; // 발문
+	private long passageId; // 지문 id
 
 	@NotBlank
 	private String questionContent; // 지문
 
 	@NotBlank
-	private String questionAnswer; // 정답
+	private String questionTitle; // 발문
 
-	private boolean pastYn; // 기출 여부
+	private List<QuestionDto> questionDtos = new ArrayList<>(); // 문제 list
 
-	private long passageId; // 지문 id
+	@Getter
+	@Setter
+	public static class QuestionDto {
+		private String questionSubTitle; // sub 발문(복합 지문일 경우)
 
-	private List<ChooseDto> chooseList = new ArrayList<>();
+		private boolean pastYn; // 기출 여부
 
-	private List<AnswerDto> answerList = new ArrayList<>();
+		private QuestionType questionType; // 유형
+
+		private List<ChooseDto> chooseList = new ArrayList<>();
+
+		private List<AnswerDto> answerList = new ArrayList<>();
+	}
 
 }

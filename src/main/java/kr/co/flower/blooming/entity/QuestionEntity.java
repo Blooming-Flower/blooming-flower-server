@@ -36,6 +36,9 @@ public class QuestionEntity extends BaseEntity {
 	@GeneratedValue
 	private long questionId;
 
+	@Column(nullable = false)
+	private String questionCode; // 문제 code
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private QuestionType questionType; // 유형
@@ -43,9 +46,7 @@ public class QuestionEntity extends BaseEntity {
 	@Column(nullable = false)
 	private String questionTitle; // 발문
 
-	@Lob
-	@Column(nullable = false)
-	private String questionContent; // 지문
+	private String questionSubTitle; // sub 발문(복합지문일 경우)
 
 	private boolean pastYn; // 기출 여부
 
@@ -54,6 +55,10 @@ public class QuestionEntity extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "passage_id")
 	private PassageEntity passageEntity;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "question_passage_id")
+	private QuestionPassageEntity questionPassageEntity;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "question_id")
