@@ -5,7 +5,7 @@ spring:
         show_sql: true
         format_sql: true
     hibernate:
-      ddl-auto: validation
+      ddl-auto: update
   datasource:
     url: ${BLOOMING_FLOWER_URL}
     username: ${BLOOMING_FLOWER_NAME}
