@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class PassageListDto {
+	private long passageId;
     private PassageType passageType;
     private String passageName; // 교재 이름
     private String passageUnit; // UNIT
@@ -13,7 +14,7 @@ public class PassageListDto {
     private long questionCount; // 문제 수
 
     @QueryProjection
-    public PassageListDto(PassageType passageType, String passageName, String passageUnit,
+    public PassageListDto(long passageId, PassageType passageType, String passageName, String passageUnit,
             String passageNumber,
             long questionCount) {
         this.passageType = passageType;

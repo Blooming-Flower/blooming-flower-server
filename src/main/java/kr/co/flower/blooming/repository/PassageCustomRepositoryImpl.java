@@ -55,7 +55,7 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 	 */
 	private List<PassageListDto> getPassageListDto(Pageable pageable, String passageYear, String passageName) {
 		return queryFactory
-				.select(new QPassageListDto(passageEntity.passageType, passageEntity.passageName,
+				.select(new QPassageListDto(passageEntity.passageId, passageEntity.passageType, passageEntity.passageName,
 						passageEntity.passageUnit, passageEntity.passageNumber,
 						JPAExpressions.select(questionEntity.count()).from(questionEntity)
 								.where(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))))
