@@ -11,6 +11,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
@@ -33,7 +34,7 @@ import lombok.Data;
 @Data
 public class QuestionEntity extends BaseEntity {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long questionId;
 
 	@Column(nullable = false)
@@ -43,14 +44,12 @@ public class QuestionEntity extends BaseEntity {
 	@Column(nullable = false)
 	private QuestionType questionType; // 유형
 
-	@Column(nullable = false)
-	private String questionTitle; // 발문
+	@Lob
+	private String subBox; // 보기 박스
 
 	private String questionSubTitle; // sub 발문(복합지문일 경우)
 
 	private boolean pastYn; // 기출 여부
-
-	private boolean saveYn; // 실제 저장 여부
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "passage_id")
@@ -58,7 +57,7 @@ public class QuestionEntity extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "question_content_id")
-	private QuestionContentEntity questionPassageEntity;
+	private QuestionContentEntity questionContentEntity;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "question_id")

@@ -12,8 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class QuestionRegistDto {
-	private long questionId;
-
 	private long passageId; // 지문 id
 
 	@NotBlank
@@ -21,7 +19,7 @@ public class QuestionRegistDto {
 
 	@NotBlank
 	private String questionTitle; // 발문
-
+	
 	private List<QuestionDto> questionDtos = new ArrayList<>(); // 문제 list
 
 	@Getter
@@ -32,6 +30,8 @@ public class QuestionRegistDto {
 		private boolean pastYn; // 기출 여부
 
 		private QuestionType questionType; // 유형
+		
+		private String subBox; // 보기박스
 
 		private List<ChooseDto> chooseList = new ArrayList<>();
 

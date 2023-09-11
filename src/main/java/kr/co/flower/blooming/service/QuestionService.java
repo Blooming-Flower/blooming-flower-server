@@ -6,11 +6,12 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.co.flower.blooming.dto.in.QuestionRegistDto;
+import kr.co.flower.blooming.dto.in.QuestionUpdateDto;
 import kr.co.flower.blooming.dto.in.QuestionRegistDto.QuestionDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.QuestionEntity;
 import kr.co.flower.blooming.entity.QuestionContentEntity;
-import kr.co.flower.blooming.entity.QuestionPassageRepository;
+import kr.co.flower.blooming.entity.QuestionContentRepository;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
 import kr.co.flower.blooming.repository.PassageRepository;
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QuestionService {
 	private final QuestionRepository questionRepository;
 	private final PassageRepository passageRepository;
-	private final QuestionPassageRepository questionPassageRepository;
+	private final QuestionContentRepository questionContentRepository;
 
 	/**
 	 * 문제 저장
@@ -40,9 +41,32 @@ public class QuestionService {
 	 */
 	@Transactional
 	public void saveQuestion(QuestionRegistDto questionRegistDto) {
-		QuestionEntity questionEntity = new QuestionEntity();
+		QuestionContentEntity questionContentEntity = new QuestionContentEntity();
+		questionContentEntity.setQuestionTitle(questionRegistDto.getQuestionTitle());
+		questionContentEntity.setQuestionContent(questionRegistDto.getQuestionContent());
+		questionContentRepository.save(questionContentEntity);
 
-		setQuestionEntity(questionEntity, questionRegistDto);
+		PassageEntity passage = passageRepository.findById(questionRegistDto.getPassageId())
+				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+
+		UUID uuid = UUID.randomUUID();
+
+		List<QuestionDto> questionDtos = questionRegistDto.getQuestionDtos();
+		questionDtos.forEach(question -> {
+			QuestionEntity questionEntity = new QuestionEntity();
+
+			questionEntity.setQuestionCode(uuid.toString());
+			questionEntity.setQuestionType(question.getQuestionType());
+			questionEntity.setQuestionSubTitle(question.getQuestionSubTitle());
+			questionEntity.setPastYn(question.isPastYn());
+			questionEntity.setSubBox(question.getSubBox());
+			questionEntity.setChooseEntities(question.getChooseList());
+			questionEntity.setAnswerEntities(question.getAnswerList());
+			questionEntity.setPassageEntity(passage);
+			questionEntity.setQuestionContentEntity(questionContentEntity);
+
+			questionRepository.save(questionEntity);
+		});
 	}
 
 	/**
@@ -51,11 +75,29 @@ public class QuestionService {
 	 * @param questionRegistDto
 	 */
 	@Transactional
-	public void updateQuestion(QuestionRegistDto questionRegistDto) {
-		QuestionEntity questionEntity = questionRepository.findById(questionRegistDto.getQuestionId())
+	public void updateQuestion(QuestionUpdateDto questionUpdateDto) {
+		QuestionEntity questionEntity = questionRepository.findById(questionUpdateDto.getQuestionId())
 				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-		setQuestionEntity(questionEntity, questionRegistDto);
+		QuestionContentEntity questionContentEntity = questionEntity.getQuestionContentEntity();
+		questionContentEntity.setQuestionTitle(questionUpdateDto.getQuestionTitle());
+		questionContentEntity.setQuestionContent(questionUpdateDto.getQuestionContent());
+		questionContentRepository.save(questionContentEntity);
+
+		PassageEntity passage = passageRepository.findById(questionUpdateDto.getPassageId())
+				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+
+		questionEntity.setQuestionType(questionUpdateDto.getQuestionType());
+		questionEntity.setQuestionSubTitle(questionUpdateDto.getQuestionSubTitle());
+		questionEntity.setPastYn(questionUpdateDto.isPastYn());
+		questionEntity.setSubBox(questionUpdateDto.getSubBox());
+		questionEntity.setChooseEntities(questionUpdateDto.getChooseList());
+		questionEntity.setAnswerEntities(questionUpdateDto.getAnswerList());
+		questionEntity.setPassageEntity(passage);
+		questionEntity.setQuestionContentEntity(questionContentEntity);
+
+		questionRepository.save(questionEntity);
+
 	}
 
 	/**
@@ -70,30 +112,4 @@ public class QuestionService {
 		questionRepository.deleteById(questionId);
 	}
 
-	private void setQuestionEntity(QuestionEntity questionEntity, QuestionRegistDto questionRegistDto) {
-		QuestionContentEntity questionPassageEntity = new QuestionContentEntity();
-		questionPassageEntity.setQuestionContent(questionRegistDto.getQuestionContent());
-		questionPassageRepository.save(questionPassageEntity);
-
-		PassageEntity passage = passageRepository.findById(questionRegistDto.getPassageId())
-				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
-
-		UUID uuid = UUID.randomUUID();
-
-		List<QuestionDto> questionDtos = questionRegistDto.getQuestionDtos();
-		questionDtos.forEach(question -> {
-			questionEntity.setQuestionCode(uuid.toString());
-			questionEntity.setQuestionType(question.getQuestionType());
-			questionEntity.setQuestionTitle(questionRegistDto.getQuestionTitle());
-			questionEntity.setQuestionSubTitle(question.getQuestionSubTitle());
-			questionEntity.setAnswerEntities(question.getAnswerList());
-			questionEntity.setPastYn(question.isPastYn());
-			questionEntity.setChooseEntities(question.getChooseList());
-			questionEntity.setAnswerEntities(question.getAnswerList());
-			questionEntity.setPassageEntity(passage);
-
-			questionRepository.save(questionEntity);
-		});
-
-	}
 }

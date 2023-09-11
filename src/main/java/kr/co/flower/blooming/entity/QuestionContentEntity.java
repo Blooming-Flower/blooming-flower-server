@@ -1,10 +1,9 @@
 package kr.co.flower.blooming.entity;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -22,8 +21,11 @@ import lombok.Data;
 @Data
 public class QuestionContentEntity {
 	@Id
-	@GeneratedValue
-	private long questionPassageId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long questionContentId;
+
+	@Column(nullable = false)
+	private String questionTitle; // 발문
 	
 	@Lob
 	@Column(nullable = false)

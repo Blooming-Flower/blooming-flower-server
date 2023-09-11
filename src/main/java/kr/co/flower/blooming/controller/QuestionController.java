@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.flower.blooming.dto.in.QuestionRegistDto;
+import kr.co.flower.blooming.dto.in.QuestionUpdateDto;
 import kr.co.flower.blooming.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +35,8 @@ public class QuestionController {
 	@ApiResponses({ @ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.") })
 	@Operation(description = "문제 수정", summary = "문제 수정")
 	@PutMapping(path = "/update")
-	public ResponseEntity<?> updateQuestion(@RequestBody @Valid QuestionRegistDto questionRegistDto) {
-		questionService.updateQuestion(questionRegistDto);
+	public ResponseEntity<?> updateQuestion(@RequestBody @Valid QuestionUpdateDto questionUpdateDto) {
+		questionService.updateQuestion(questionUpdateDto);
 		return ResponseEntity.ok().build();
 	}
 
