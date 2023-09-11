@@ -61,8 +61,8 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 								.where(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))))
 				.from(passageEntity).where(getPredicateOfWhere(passageYear, passageName))
 				.offset(pageable.getOffset())
-				.limit(pageable.getPageSize()).orderBy(questionEntity.passageEntity.passageName.asc(),
-						questionEntity.passageEntity.passageUnit.asc(), questionEntity.passageEntity.passageNumber.asc())
+				.limit(pageable.getPageSize()).orderBy(passageEntity.passageName.asc(),
+						passageEntity.passageUnit.asc(), passageEntity.passageNumber.asc())
 //				.orderBy(getOrderSpecifiers(pageable.getSort()).toArray(OrderSpecifier[]::new))
 				.fetch();
 	}
