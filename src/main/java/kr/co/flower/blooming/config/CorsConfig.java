@@ -18,7 +18,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // TODO 추후 프론트 서버로 MAPPING 정보 바꿔줌
                 .allowedOrigins("*")
-                .allowedHeaders("*")
+//                .allowedHeaders("*")
                 .allowedMethods("*")
                 .maxAge(3000);
     }
