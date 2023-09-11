@@ -54,7 +54,7 @@ public class PassageEntity extends BaseEntity {
     private String passageContent; // 지문
 
     @OneToMany(mappedBy = "questionId", fetch = FetchType.LAZY)
-    List<QuestionEntity> questionEntities = new ArrayList<>();
+    private List<QuestionEntity> questionEntities = new ArrayList<>();
 
 
 

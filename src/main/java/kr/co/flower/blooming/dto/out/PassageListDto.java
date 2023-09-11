@@ -17,6 +17,7 @@ public class PassageListDto {
     public PassageListDto(long passageId, PassageType passageType, String passageName, String passageUnit,
             String passageNumber,
             long questionCount) {
+    	this.passageId = passageId;
         this.passageType = passageType;
         this.passageName = passageName;
         this.passageUnit = passageUnit;

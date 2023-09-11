@@ -6,7 +6,6 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-    open-in-view: false
   datasource:
     url: ${BLOOMING_FLOWER_URL}
     username: ${BLOOMING_FLOWER_NAME}
