@@ -6,7 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum PassageType {
-    TEXT_BOOK("교과서"), MOCK_TEST("모의고사"), EBS("EBS"), SUB_TEXT_BOOK("부교재"), OUT_SIDE_PASSAGE("외부 지문");
+    P1("교과서"), P2("모의고사"), P3("EBS"), P4("부교재"), P5("외부 지문");
     
     private String passageType;
 }

@@ -92,7 +92,7 @@ public class PassageRepositoryTest {
                 }
             }
 
-            passageEntity.setPassageType(PassageType.TEXT_BOOK);
+            passageEntity.setPassageType(PassageType.P1);
             passageEntity.setPassageYear(year);
             passageEntity.setPassageName("지문" + name);
             passageEntity.setPassageUnit("지문 유닛" + unit);

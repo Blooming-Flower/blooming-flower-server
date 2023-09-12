@@ -34,7 +34,7 @@ public class PassageServiceTest {
     private PassageRepository passageRepository;
 
     private String name = "지문이름";
-    private PassageType type = PassageType.EBS;
+    private PassageType type = PassageType.P3;
     private String year = "2023";
     private String unit = "지문유닛";
     private String number = "4";
