@@ -16,10 +16,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // TODO 추후 프론트 서버로 MAPPING 정보 바꿔줌
-                .allowedOrigins("*")
-//                .allowedHeaders("*")
-                .allowedMethods("*")
-                .maxAge(3000);
+        registry.addMapping("/**").allowedOrigins("*")
+        .allowedHeaders("Accept", "Origin", "X-Requested-With", "Content-Type")
+        .allowedMethods("*")
+        .exposedHeaders("Content-Disposition");
     }
 }
