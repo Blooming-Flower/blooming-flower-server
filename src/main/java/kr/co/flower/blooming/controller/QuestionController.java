@@ -47,12 +47,4 @@ public class QuestionController {
 		questionService.deleteQuestion(questionId);
 		return ResponseEntity.ok().build();
 	}
-
-	@ApiResponses({ @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.") })
-	@Operation(description = "지문 수정 버튼 누를 시 화면 목록 조회", summary = "지문 수정 버튼 - 지문, 문제 유형 list 조회")
-	@DeleteMapping(path = "/search/{questionId}")
-	public ResponseEntity<?> searchQuestionList(@PathVariable(name = "questionId") long questionId) {
-		questionService.deleteQuestion(questionId);
-		return ResponseEntity.ok().build();
-	}
 }

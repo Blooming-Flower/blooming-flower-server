@@ -15,6 +15,8 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.dto.out.QPassageListDto;
+import kr.co.flower.blooming.entity.PassageType;
+
 import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
 import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
 import lombok.RequiredArgsConstructor;
@@ -125,6 +127,18 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 
 	private BooleanExpression eqPassageName(String passageName) {
 		return passageName != null ? passageEntity.passageName.contains(passageName) : null;
+	}
+
+	/**
+	 * 교재 종류별, 입력된 교재이름이 포함된 교재 이름 목록 검색
+	 */
+	@Override
+	public List<String> searchPassageNameList(PassageType passageType, String passageName) {
+		return queryFactory.select(passageEntity.passageName)
+				.from(passageEntity)
+				.where(passageEntity.passageType.eq(passageType), 
+						passageEntity.passageName.contains(passageName))
+				.fetch();
 	}
 
 }

@@ -33,11 +33,6 @@ dependencies {
 	// querydsl 디펜던시 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}" 
-    
-    // pdf
-	implementation 'com.itextpdf:itextpdf:5.5.13.3'
-	implementation 'com.itextpdf.tool:xmlworker:5.5.13.3'
-	implementation 'com.itextpdf:pdfa:7.2.3'
 	
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'

@@ -1,13 +1,20 @@
 package kr.co.flower.blooming.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.co.flower.blooming.dto.in.PassageRegistDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
+import kr.co.flower.blooming.dto.out.SearchPassageDto;
+import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
+import kr.co.flower.blooming.entity.QuestionEntity;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
 import kr.co.flower.blooming.repository.PassageRepository;
@@ -67,14 +74,32 @@ public class PassageService {
 	}
 
 	/**
-	 * 단일 지문 조회
+	 * 지문 수정을 누르면 보이는 화면
 	 * 
 	 * @param passageId
 	 * @return
 	 */
-	public PassageEntity findPassage(long passageId) {
-		return passageRepository.findById(passageId)
+	public SearchPassageDto searchPassageInfo(long passageId) {
+		SearchPassageDto searchPassageDto = new SearchPassageDto();
+
+		PassageEntity passage = passageRepository.findById(passageId)
 				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+
+		List<QuestionEntity> questionEntities = passage.getQuestionEntities();
+
+		Map<String, List<SearchQuestionDto>> collect = questionEntities.stream()
+				.collect(Collectors.groupingBy(QuestionEntity::getQuestionCode, Collectors.mapping(q -> {
+					SearchQuestionDto searchQuestionDto = new SearchQuestionDto();
+					searchQuestionDto.setQuestionType(q.getQuestionType());
+					searchQuestionDto.setQuestionId(q.getQuestionId());
+
+					return searchQuestionDto;
+				}, Collectors.toList())));
+
+		searchPassageDto.setPassageContent(passage.getPassageContent());
+		searchPassageDto.setQuestions(collect);
+
+		return searchPassageDto;
 	}
 
 	/**
@@ -85,6 +110,17 @@ public class PassageService {
 	 */
 	public Page<PassageListDto> searchPassageList(Pageable pageable, String passageYear, String passageName) {
 		return passageRepository.findPassageAll(pageable, passageYear, passageName);
+	}
+	
+	
+	/**
+	 * 교재 종류에 따라 현재 작성된 교재 이름이 포함된 교재 이름 목록 조회
+	 * 
+	 * @param passageType
+	 * @param passageName
+	 */
+	public List<String> searchPassageNameList(PassageType passageType, String passageName) {
+		return passageRepository.searchPassageNameList(passageType, passageName);
 	}
 
 	private void setPassageEntity(PassageEntity passageEntity, PassageRegistDto passageRegistDto) {

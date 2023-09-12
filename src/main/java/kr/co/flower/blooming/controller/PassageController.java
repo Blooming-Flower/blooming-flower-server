@@ -56,11 +56,10 @@ public class PassageController {
 	}
 
 	@ApiResponses({ @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.") })
-	@Operation(description = "지문 단건 조회", summary = "지문 단건 조회")
-	@GetMapping(path = "/find/{passageId}")
-	public ResponseEntity<?> findPassage(@PathVariable(name = "passageId") long passageId) {
-		PassageEntity passage = passageService.findPassage(passageId);
-		return ResponseEntity.ok(passage);
+	@Operation(description = "지문 단건 조회", summary = "지문 수정 버튼 - 지문, 문제 유형 list 조회")
+	@GetMapping(path = "/search/{passageId}")
+	public ResponseEntity<?> searchPassageInfo(@PathVariable(name = "passageId") long passageId) {
+		return ResponseEntity.ok(passageService.searchPassageInfo(passageId));
 	}
 
 	@ApiResponses({ @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.") })
@@ -71,4 +70,12 @@ public class PassageController {
 		Page<PassageListDto> passageList = passageService.searchPassageList(pageable, passageYear, passageName);
 		return ResponseEntity.ok(passageList);
 	}
+	
+	@Operation(description = "교재 종류별, 입력된 교재이름이 포함된 교재 이름 목록 검색", summary = "교재 종류별, 입력된 교재이름이 포함된 교재 이름 목록 검색")
+	@GetMapping(path = "/search/name")
+	public ResponseEntity<?> searchPassageTitle(PassageType passageType, String passageName){
+		return ResponseEntity.ok(passageService.searchPassageNameList(passageType, passageName));
+	}
+	
+	
 }
