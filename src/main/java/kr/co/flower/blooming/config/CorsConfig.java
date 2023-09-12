@@ -18,7 +18,8 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowedOrigins(
                 "http://43.201.142.170:3000, http://localhost:3000, http://127.0.0.1:3000, http://localhost:5000, http://127.0.0.1:5000")
-                .allowedHeaders("Accept", "Origin", "X-Requested-With", "Content-Type")
+                .allowedHeaders("Accept", "Origin", "X-Requested-With", "Content-Type",
+                        "Access-Control-Allow-Origin", "Access-Control-Allow-Headers")
                 .allowedMethods("*")
                 .exposedHeaders("Content-Disposition");
     }
