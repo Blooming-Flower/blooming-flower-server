@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -26,7 +28,8 @@ import lombok.ToString;
  */
 @Entity
 @Table(name = "PASSAGE")
-@Data
+@Getter
+@Setter
 @ToString(exclude = {"questionEntities"})
 public class PassageEntity extends BaseEntity {
     @Id
@@ -52,9 +55,6 @@ public class PassageEntity extends BaseEntity {
     @Column(nullable = false)
     private String passageContent; // 지문
 
-    @OneToMany(mappedBy = "passageEntity", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "passageEntity", fetch = FetchType.LAZY)
     private List<QuestionEntity> questionEntities = new ArrayList<>();
-
-
-
 }

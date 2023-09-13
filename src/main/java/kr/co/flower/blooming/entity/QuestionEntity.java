@@ -22,6 +22,8 @@ import javax.persistence.Table;
 import kr.co.flower.blooming.dto.in.AnswerDto;
 import kr.co.flower.blooming.dto.in.ChooseDto;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 문제 table
@@ -31,7 +33,8 @@ import lombok.Data;
  */
 @Entity
 @Table(name = "QUESTION")
-@Data
+@Getter
+@Setter
 public class QuestionEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,11 +62,11 @@ public class QuestionEntity extends BaseEntity {
 	@JoinColumn(name = "question_content_id")
 	private QuestionContentEntity questionContentEntity;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "question_id")
 	private List<ChooseEntity> chooseEntities = new ArrayList<>();
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "question_id")
 	private List<AnswerEntity> answerEntities = new ArrayList<>();
 

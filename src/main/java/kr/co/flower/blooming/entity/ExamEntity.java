@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 시험지 table
@@ -23,7 +25,8 @@ import lombok.Data;
  */
 @Entity
 @Table(name = "EXAM")
-@Data
+@Getter
+@Setter
 public class ExamEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
