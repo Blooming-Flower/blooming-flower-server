@@ -2,19 +2,21 @@ package kr.co.flower.blooming.service;
 
 import java.util.List;
 import java.util.UUID;
-
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import kr.co.flower.blooming.dto.in.QuestionRegistDto;
 import kr.co.flower.blooming.dto.in.QuestionUpdateDto;
 import kr.co.flower.blooming.dto.in.QuestionRegistDto.QuestionDto;
 import kr.co.flower.blooming.entity.PassageEntity;
+import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.entity.QuestionEntity;
 import kr.co.flower.blooming.entity.QuestionContentEntity;
-import kr.co.flower.blooming.entity.QuestionContentRepository;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
 import kr.co.flower.blooming.repository.PassageRepository;
+import kr.co.flower.blooming.repository.QuestionContentRepository;
 import kr.co.flower.blooming.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -111,5 +113,25 @@ public class QuestionService {
 
 		questionRepository.deleteById(questionId);
 	}
+	
+	/**
+     * 검색 조건에 따라 지문 번호 - 지문 강에 따라 그루핑 하여 조회
+     * 
+     * 페이징 처리
+     * 
+     * @param pabeable
+     * @param passageType 
+     * @param passageYear
+     * @param passageName
+     */
+    public void searchPassageNumbers(Pageable pageable,  PassageType passageType, String passageYear, String passageName) {
+        // 페이징된 passage unit 
+        List<String> units = passageRepository
+                .searchPassageUnitGroupByUnit(pageable, passageType, passageYear, passageName)
+                .getContent();
+        
+        // passage unit에 해당되는 passage number 조회
+        
+    }
 
 }

@@ -1,13 +1,16 @@
 package kr.co.flower.blooming.controller;
 
 import javax.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.flower.blooming.dto.in.QuestionRegistDto;
 import kr.co.flower.blooming.dto.in.QuestionUpdateDto;
+import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 
@@ -23,28 +27,39 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class QuestionController {
-	private final QuestionService questionService;
+    private final QuestionService questionService;
 
-	@Operation(description = "문제 저장", summary = "문제 저장")
-	@PostMapping(path = "/save")
-	public ResponseEntity<?> saveQuestion(@RequestBody @Valid QuestionRegistDto questionRegistDto) {
-		questionService.saveQuestion(questionRegistDto);
-		return ResponseEntity.ok().build();
-	}
+    @Operation(description = "문제 저장", summary = "문제 저장")
+    @PostMapping(path = "/save")
+    public ResponseEntity<?> saveQuestion(@RequestBody @Valid QuestionRegistDto questionRegistDto) {
+        questionService.saveQuestion(questionRegistDto);
+        return ResponseEntity.ok().build();
+    }
 
-	@ApiResponses({ @ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.") })
-	@Operation(description = "문제 수정", summary = "문제 수정")
-	@PutMapping(path = "/update")
-	public ResponseEntity<?> updateQuestion(@RequestBody @Valid QuestionUpdateDto questionUpdateDto) {
-		questionService.updateQuestion(questionUpdateDto);
-		return ResponseEntity.ok().build();
-	}
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.")})
+    @Operation(description = "문제 수정", summary = "문제 수정")
+    @PutMapping(path = "/update")
+    public ResponseEntity<?> updateQuestion(
+            @RequestBody @Valid QuestionUpdateDto questionUpdateDto) {
+        questionService.updateQuestion(questionUpdateDto);
+        return ResponseEntity.ok().build();
+    }
 
-	@ApiResponses({ @ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.") })
-	@Operation(description = "문제 삭제", summary = "문제 삭제")
-	@DeleteMapping(path = "/delete/{questionId}")
-	public ResponseEntity<?> deleteQuestion(@PathVariable(name = "questionId") long questionId) {
-		questionService.deleteQuestion(questionId);
-		return ResponseEntity.ok().build();
-	}
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")})
+    @Operation(description = "문제 삭제", summary = "문제 삭제")
+    @DeleteMapping(path = "/delete/{questionId}")
+    public ResponseEntity<?> deleteQuestion(@PathVariable(name = "questionId") long questionId) {
+        questionService.deleteQuestion(questionId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(description = "연도, 교재, 강 검색조건에 따라 조회", summary = "[문제 출제] 강, 지문 번호 조회")
+    @GetMapping(path = "/search/passageNumbers")
+    public ResponseEntity<?> searchPassageNumbers(
+            Pageable pageable,
+            @RequestParam(required = false) PassageType passageType,
+            @RequestParam(required = false) String passageYear,
+            @RequestParam(required = false) String passageName) {
+        return null;
+    }
 }

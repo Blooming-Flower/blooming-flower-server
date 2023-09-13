@@ -122,6 +122,15 @@ public class PassageService {
 	public List<String> searchPassageNameList(PassageType passageType, String passageName) {
 		return passageRepository.searchPassageNameList(passageType, passageName);
 	}
+	
+	/**
+	 * [문제 출제] 강, 지문 번호 조회
+	 * 
+	 * 연도, 교재, 강 검색조건에 따라 조회
+	 */
+	public void test() {
+	    
+	}
 
 	private void setPassageEntity(PassageEntity passageEntity, PassageRegistDto passageRegistDto) {
 		passageEntity.setPassageType(passageRegistDto.getPassageType());
