@@ -14,8 +14,10 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.co.flower.blooming.dto.out.CheckExistPassageDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
+import kr.co.flower.blooming.dto.out.QCheckExistPassageDto;
 import kr.co.flower.blooming.dto.out.QPassageListDto;
 import kr.co.flower.blooming.dto.out.QPassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.entity.PassageType;
@@ -220,7 +222,8 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 
         return queryFactory
                 .select(new QPassageNumberAndQuestionCountDto(
-                        passageEntity.passageUnit, passageEntity.passageNumber, passageEntity.passageId.max(),
+                        passageEntity.passageUnit, passageEntity.passageNumber,
+                        passageEntity.passageId.max(),
                         questionEntity.count()))
                 .from(passageEntity)
                 .leftJoin(questionEntity)
@@ -242,6 +245,26 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
                 .where(passageEntity.passageType.eq(passageType),
                         passageEntity.passageYear.eq(year))
                 .fetch();
+    }
+
+    /**
+     * 같은 지문의 종류, 연도, 교재, 강, 번호에 대해선 유니크 해야 한다.
+     * 
+     * 만약 같은 지문이라면 지문 id와 content return후 지문 수정 로직 타도록 해야 함
+     */
+    @Override
+    public CheckExistPassageDto checkExistPassage(PassageType passageType, String passageYear,
+            String passageName, String passageUnit, String passageNumber) {
+        return queryFactory
+                .select(new QCheckExistPassageDto(passageEntity.passageId,
+                        passageEntity.passageContent))
+                .from(passageEntity)
+                .where(passageEntity.passageType.eq(passageType),
+                        passageEntity.passageYear.eq(passageYear),
+                        passageEntity.passageName.eq(passageName),
+                        passageEntity.passageUnit.eq(passageUnit),
+                        passageEntity.passageNumber.eq(passageNumber))
+                .fetchOne();
     }
 
 

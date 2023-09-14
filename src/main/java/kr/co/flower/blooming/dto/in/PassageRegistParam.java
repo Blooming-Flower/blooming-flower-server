@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PassageRegistDto {
+public class PassageRegistParam {
     private long passageId;
 
     private PassageType passageType; // 교재 종류

@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AnswerDto {
+public class AnswerParam {
 	private String answerContent;
 }

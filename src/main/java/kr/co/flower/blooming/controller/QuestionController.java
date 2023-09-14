@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.flower.blooming.dto.in.QuestionRegistDto;
-import kr.co.flower.blooming.dto.in.QuestionUpdateDto;
+import kr.co.flower.blooming.dto.in.QuestionRegistParam;
+import kr.co.flower.blooming.dto.in.QuestionUpdateParam;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.service.QuestionService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class QuestionController {
 
     @Operation(description = "문제 저장", summary = "문제 저장")
     @PostMapping(path = "/save")
-    public ResponseEntity<?> saveQuestion(@RequestBody @Valid QuestionRegistDto questionRegistDto) {
+    public ResponseEntity<?> saveQuestion(@RequestBody @Valid QuestionRegistParam questionRegistDto) {
         questionService.saveQuestion(questionRegistDto);
         return ResponseEntity.ok().build();
     }
@@ -39,7 +39,7 @@ public class QuestionController {
     @Operation(description = "문제 수정", summary = "문제 수정")
     @PutMapping(path = "/update")
     public ResponseEntity<?> updateQuestion(
-            @RequestBody @Valid QuestionUpdateDto questionUpdateDto) {
+            @RequestBody @Valid QuestionUpdateParam questionUpdateDto) {
         questionService.updateQuestion(questionUpdateDto);
         return ResponseEntity.ok().build();
     }

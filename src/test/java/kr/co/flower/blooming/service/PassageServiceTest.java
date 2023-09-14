@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.flower.blooming.dto.in.PassageRegistDto;
+import kr.co.flower.blooming.dto.in.PassageRegistParam;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.exception.FlowerException;
@@ -45,7 +45,7 @@ public class PassageServiceTest {
     @Transactional
     void savePassageTest() {
         // given
-        PassageRegistDto registDto = makePassageRegistDto();
+        PassageRegistParam registDto = makePassageRegistDto();
 
         // when
         passageService.savePassage(registDto);
@@ -70,7 +70,7 @@ public class PassageServiceTest {
         // given
         String updateName = "수정된이름";
 
-        PassageRegistDto registDto = makePassageRegistDto();
+        PassageRegistParam registDto = makePassageRegistDto();
 
         passageService.savePassage(registDto);
 
@@ -106,7 +106,7 @@ public class PassageServiceTest {
     @Transactional
     void deletePassageTest() {
         // given
-        PassageRegistDto registDto = makePassageRegistDto();
+        PassageRegistParam registDto = makePassageRegistDto();
 
         passageService.savePassage(registDto);
 
@@ -134,7 +134,7 @@ public class PassageServiceTest {
     @Transactional
     void findPassageTest() {
         // given
-        PassageRegistDto registDto = makePassageRegistDto();
+        PassageRegistParam registDto = makePassageRegistDto();
 
         passageService.savePassage(registDto);
 
@@ -160,8 +160,8 @@ public class PassageServiceTest {
 //        assertEquals(findPassage.getPassageContent(), content);
     }
 
-    private PassageRegistDto makePassageRegistDto() {
-        PassageRegistDto passageRegistDto = new PassageRegistDto();
+    private PassageRegistParam makePassageRegistDto() {
+        PassageRegistParam passageRegistDto = new PassageRegistParam();
         passageRegistDto.setPassageName(name);
         passageRegistDto.setPassageType(type);
         passageRegistDto.setPassageUnit(unit);

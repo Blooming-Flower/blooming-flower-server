@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import kr.co.flower.blooming.dto.in.QuestionRegistDto;
-import kr.co.flower.blooming.dto.in.QuestionRegistDto.QuestionDto;
-import kr.co.flower.blooming.dto.in.QuestionUpdateDto;
+import kr.co.flower.blooming.dto.in.QuestionRegistParam;
+import kr.co.flower.blooming.dto.in.QuestionRegistParam.QuestionDto;
+import kr.co.flower.blooming.dto.in.QuestionUpdateParam;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
@@ -44,7 +44,7 @@ public class QuestionService {
      * @param questionRegistDto
      */
     @Transactional
-    public void saveQuestion(QuestionRegistDto questionRegistDto) {
+    public void saveQuestion(QuestionRegistParam questionRegistDto) {
         QuestionContentEntity questionContentEntity = new QuestionContentEntity();
         questionContentEntity.setQuestionTitle(questionRegistDto.getQuestionTitle());
         questionContentEntity.setQuestionContent(questionRegistDto.getQuestionContent());
@@ -79,7 +79,7 @@ public class QuestionService {
      * @param questionRegistDto
      */
     @Transactional
-    public void updateQuestion(QuestionUpdateDto questionUpdateDto) {
+    public void updateQuestion(QuestionUpdateParam questionUpdateDto) {
         QuestionEntity questionEntity =
                 questionRepository.findById(questionUpdateDto.getQuestionId())
                         .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));

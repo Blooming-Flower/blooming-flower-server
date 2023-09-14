@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class QuestionRegistDto {
+public class QuestionRegistParam {
 	private long passageId; // 지문 id
 
 	@NotBlank
@@ -33,9 +33,9 @@ public class QuestionRegistDto {
 		
 		private String subBox; // 보기박스
 
-		private List<ChooseDto> chooseList = new ArrayList<>();
+		private List<ChooseParam> chooseList = new ArrayList<>();
 
-		private List<AnswerDto> answerList = new ArrayList<>();
+		private List<AnswerParam> answerList = new ArrayList<>();
 	}
 
 }

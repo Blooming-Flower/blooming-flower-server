@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.flower.blooming.dto.in.PassageRegistDto;
+import kr.co.flower.blooming.dto.in.PassageRegistParam;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.service.PassageService;
@@ -33,7 +33,7 @@ public class PassageController {
 
     @Operation(description = "지문 저장", summary = "지문 저장")
     @PostMapping(path = "/save")
-    public ResponseEntity<?> savePassage(@RequestBody @Valid PassageRegistDto passageRegistDto) {
+    public ResponseEntity<?> savePassage(@RequestBody @Valid PassageRegistParam passageRegistDto) {
         passageService.savePassage(passageRegistDto);
         return ResponseEntity.ok().build();
     }
@@ -41,7 +41,8 @@ public class PassageController {
     @ApiResponses({@ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")})
     @Operation(description = "지문 수정", summary = "지문 수정")
     @PutMapping(path = "/update")
-    public ResponseEntity<?> updatePassage(@RequestBody @Valid PassageRegistDto passageRegistDto) {
+    public ResponseEntity<?> updatePassage(
+            @RequestBody @Valid PassageRegistParam passageRegistDto) {
         passageService.updatePassage(passageRegistDto);
         return ResponseEntity.ok().build();
     }
@@ -77,5 +78,18 @@ public class PassageController {
     @GetMapping(path = "/search/name")
     public ResponseEntity<?> searchPassageTitle(PassageType passageType, String passageName) {
         return ResponseEntity.ok(passageService.searchPassageNameList(passageType, passageName));
+    }
+
+    @Operation(description = "만약 같은 지문이라면 지문 id와 content return후 지문 수정 로직 타도록 해야 함",
+            summary = "[지문 저장] 종류, 연도, 교재, 강, 번호 다 채웠을 때 이미 저장된 지문인지 check")
+    @GetMapping(path = "/check/exist/passage")
+    public ResponseEntity<?> checkExistPassage(
+            PassageType passageType,
+            String passageYear,
+            String passageName,
+            String passageUnit,
+            String passageNumber) {
+        return ResponseEntity.ok(passageService.checkExistPassage(passageType, passageYear,
+                passageName, passageUnit, passageNumber));
     }
 }

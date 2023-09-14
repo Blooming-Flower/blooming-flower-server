@@ -19,8 +19,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import kr.co.flower.blooming.dto.in.AnswerDto;
-import kr.co.flower.blooming.dto.in.ChooseDto;
+import kr.co.flower.blooming.dto.in.AnswerParam;
+import kr.co.flower.blooming.dto.in.ChooseParam;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,7 +70,7 @@ public class QuestionEntity extends BaseEntity {
 	@JoinColumn(name = "question_id")
 	private List<AnswerEntity> answerEntities = new ArrayList<>();
 
-	public void setChooseEntities(List<ChooseDto> chooseDtos) {
+	public void setChooseEntities(List<ChooseParam> chooseDtos) {
 		List<ChooseEntity> chooseList = chooseDtos.stream().map(dto -> {
 			ChooseEntity chooseEntity = new ChooseEntity();
 			chooseEntity.setChooseSeq(dto.getChooseSeq());
@@ -85,7 +85,7 @@ public class QuestionEntity extends BaseEntity {
 		}
 	}
 
-	public void setAnswerEntities(List<AnswerDto> answerDtos) {
+	public void setAnswerEntities(List<AnswerParam> answerDtos) {
 		List<AnswerEntity> answerList = answerDtos.stream().map(dto -> {
 			AnswerEntity answerEntity = new AnswerEntity();
 			answerEntity.setAnswerContent(dto.getAnswerContent());
