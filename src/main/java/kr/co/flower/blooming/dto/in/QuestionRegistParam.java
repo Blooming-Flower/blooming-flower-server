@@ -20,11 +20,11 @@ public class QuestionRegistParam {
 	@NotBlank
 	private String questionTitle; // 발문
 	
-	private List<QuestionDto> questionDtos = new ArrayList<>(); // 문제 list
+	private List<QuestionParam> questionParams = new ArrayList<>(); // 문제 list
 
 	@Getter
 	@Setter
-	public static class QuestionDto {
+	public static class QuestionParam {
 		private String questionSubTitle; // sub 발문(복합 지문일 경우)
 
 		private boolean pastYn; // 기출 여부

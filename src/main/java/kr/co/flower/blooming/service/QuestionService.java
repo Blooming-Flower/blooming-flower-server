@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.co.flower.blooming.dto.in.QuestionRegistParam;
-import kr.co.flower.blooming.dto.in.QuestionRegistParam.QuestionDto;
+import kr.co.flower.blooming.dto.in.QuestionRegistParam.QuestionParam;
 import kr.co.flower.blooming.dto.in.QuestionUpdateParam;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.entity.PassageEntity;
@@ -55,7 +55,7 @@ public class QuestionService {
 
         UUID uuid = UUID.randomUUID();
 
-        List<QuestionDto> questionDtos = questionRegistDto.getQuestionDtos();
+        List<QuestionParam> questionDtos = questionRegistDto.getQuestionDtos();
         questionDtos.forEach(question -> {
             QuestionEntity questionEntity = new QuestionEntity();
 
