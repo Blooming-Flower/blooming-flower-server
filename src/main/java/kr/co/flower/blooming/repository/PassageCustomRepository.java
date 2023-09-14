@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import kr.co.flower.blooming.dto.out.CheckExistPassageDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
+import kr.co.flower.blooming.dto.out.PassageNameDto;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.entity.PassageType;
 
@@ -32,7 +33,7 @@ public interface PassageCustomRepository {
      * @param passageName
      * @return
      */
-    List<String> searchPassageNameList(PassageType passageType, String passageName);
+    List<PassageNameDto> searchPassageNameList(PassageType passageType, String passageName);
 
     /**
      * 검색 조건에 따라 지문 (강) 조회
