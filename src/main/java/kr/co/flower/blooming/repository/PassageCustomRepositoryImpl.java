@@ -220,7 +220,7 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 
         return queryFactory
                 .select(new QPassageNumberAndQuestionCountDto(
-                        passageEntity.passageUnit, passageEntity.passageNumber,
+                        passageEntity.passageUnit, passageEntity.passageNumber, passageEntity.passageId,
                         questionEntity.count()))
                 .from(passageEntity)
                 .leftJoin(questionEntity)
