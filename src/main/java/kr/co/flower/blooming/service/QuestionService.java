@@ -44,19 +44,19 @@ public class QuestionService {
      * @param questionRegistDto
      */
     @Transactional
-    public void saveQuestion(QuestionRegistParam questionRegistDto) {
+    public void saveQuestion(QuestionRegistParam questionRegistParam) {
         QuestionContentEntity questionContentEntity = new QuestionContentEntity();
-        questionContentEntity.setQuestionTitle(questionRegistDto.getQuestionTitle());
-        questionContentEntity.setQuestionContent(questionRegistDto.getQuestionContent());
+        questionContentEntity.setQuestionTitle(questionRegistParam.getQuestionTitle());
+        questionContentEntity.setQuestionContent(questionRegistParam.getQuestionContent());
         questionContentRepository.save(questionContentEntity);
 
-        PassageEntity passage = passageRepository.findById(questionRegistDto.getPassageId())
+        PassageEntity passage = passageRepository.findById(questionRegistParam.getPassageId())
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
         UUID uuid = UUID.randomUUID();
 
-        List<QuestionParam> questionDtos = questionRegistDto.getQuestionDtos();
-        questionDtos.forEach(question -> {
+        List<QuestionParam> questionParams = questionRegistParam.getQuestionParams();
+        questionParams.forEach(question -> {
             QuestionEntity questionEntity = new QuestionEntity();
 
             questionEntity.setQuestionCode(uuid.toString());
@@ -79,25 +79,25 @@ public class QuestionService {
      * @param questionRegistDto
      */
     @Transactional
-    public void updateQuestion(QuestionUpdateParam questionUpdateDto) {
+    public void updateQuestion(QuestionUpdateParam questionUpdateParam) {
         QuestionEntity questionEntity =
-                questionRepository.findById(questionUpdateDto.getQuestionId())
+                questionRepository.findById(questionUpdateParam.getQuestionId())
                         .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
         QuestionContentEntity questionContentEntity = questionEntity.getQuestionContentEntity();
-        questionContentEntity.setQuestionTitle(questionUpdateDto.getQuestionTitle());
-        questionContentEntity.setQuestionContent(questionUpdateDto.getQuestionContent());
+        questionContentEntity.setQuestionTitle(questionUpdateParam.getQuestionTitle());
+        questionContentEntity.setQuestionContent(questionUpdateParam.getQuestionContent());
         questionContentRepository.save(questionContentEntity);
 
-        PassageEntity passage = passageRepository.findById(questionUpdateDto.getPassageId())
+        PassageEntity passage = passageRepository.findById(questionUpdateParam.getPassageId())
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-        questionEntity.setQuestionType(questionUpdateDto.getQuestionType());
-        questionEntity.setQuestionSubTitle(questionUpdateDto.getQuestionSubTitle());
-        questionEntity.setPastYn(questionUpdateDto.isPastYn());
-        questionEntity.setSubBox(questionUpdateDto.getSubBox());
-        questionEntity.setChooseEntities(questionUpdateDto.getChooseList());
-        questionEntity.setAnswerEntities(questionUpdateDto.getAnswerList());
+        questionEntity.setQuestionType(questionUpdateParam.getQuestionType());
+        questionEntity.setQuestionSubTitle(questionUpdateParam.getQuestionSubTitle());
+        questionEntity.setPastYn(questionUpdateParam.isPastYn());
+        questionEntity.setSubBox(questionUpdateParam.getSubBox());
+        questionEntity.setChooseEntities(questionUpdateParam.getChooseList());
+        questionEntity.setAnswerEntities(questionUpdateParam.getAnswerList());
         questionEntity.setPassageEntity(passage);
         questionEntity.setQuestionContentEntity(questionContentEntity);
 

@@ -43,10 +43,10 @@ public class PassageService {
      * @param passageRegistDto
      */
     @Transactional
-    public void savePassage(PassageRegistParam passageRegistDto) {
+    public void savePassage(PassageRegistParam passageRegistParam) {
         PassageEntity passageEntity = new PassageEntity();
 
-        setPassageEntity(passageEntity, passageRegistDto);
+        setPassageEntity(passageEntity, passageRegistParam);
 
         passageRepository.save(passageEntity);
     }
@@ -57,11 +57,11 @@ public class PassageService {
      * @param passageRegistDto
      */
     @Transactional
-    public void updatePassage(PassageRegistParam passageRegistDto) {
-        PassageEntity passageEntity = passageRepository.findById(passageRegistDto.getPassageId())
+    public void updatePassage(PassageRegistParam passageRegistParam) {
+        PassageEntity passageEntity = passageRepository.findById(passageRegistParam.getPassageId())
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-        setPassageEntity(passageEntity, passageRegistDto);
+        setPassageEntity(passageEntity, passageRegistParam);
     }
 
     /**
@@ -139,12 +139,12 @@ public class PassageService {
     }
 
     private void setPassageEntity(PassageEntity passageEntity,
-            PassageRegistParam passageRegistDto) {
-        passageEntity.setPassageType(passageRegistDto.getPassageType());
-        passageEntity.setPassageYear(passageRegistDto.getPassageYear());
-        passageEntity.setPassageName(passageRegistDto.getPassageName());
-        passageEntity.setPassageUnit(passageRegistDto.getPassageUnit());
-        passageEntity.setPassageNumber(passageRegistDto.getPassageNumber());
-        passageEntity.setPassageContent(passageRegistDto.getPassageContent());
+            PassageRegistParam passageRegistParam) {
+        passageEntity.setPassageType(passageRegistParam.getPassageType());
+        passageEntity.setPassageYear(passageRegistParam.getPassageYear());
+        passageEntity.setPassageName(passageRegistParam.getPassageName());
+        passageEntity.setPassageUnit(passageRegistParam.getPassageUnit());
+        passageEntity.setPassageNumber(passageRegistParam.getPassageNumber());
+        passageEntity.setPassageContent(passageRegistParam.getPassageContent());
     }
 }

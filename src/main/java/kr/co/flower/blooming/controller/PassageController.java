@@ -33,8 +33,8 @@ public class PassageController {
 
     @Operation(description = "지문 저장", summary = "지문 저장")
     @PostMapping(path = "/save")
-    public ResponseEntity<?> savePassage(@RequestBody @Valid PassageRegistParam passageRegistDto) {
-        passageService.savePassage(passageRegistDto);
+    public ResponseEntity<?> savePassage(@RequestBody @Valid PassageRegistParam passageRegistParam) {
+        passageService.savePassage(passageRegistParam);
         return ResponseEntity.ok().build();
     }
 
@@ -42,8 +42,8 @@ public class PassageController {
     @Operation(description = "지문 수정", summary = "지문 수정")
     @PutMapping(path = "/update")
     public ResponseEntity<?> updatePassage(
-            @RequestBody @Valid PassageRegistParam passageRegistDto) {
-        passageService.updatePassage(passageRegistDto);
+            @RequestBody @Valid PassageRegistParam passageRegistParam) {
+        passageService.updatePassage(passageRegistParam);
         return ResponseEntity.ok().build();
     }
 

@@ -30,8 +30,8 @@ public class QuestionController {
 
     @Operation(description = "문제 저장", summary = "문제 저장")
     @PostMapping(path = "/save")
-    public ResponseEntity<?> saveQuestion(@RequestBody @Valid QuestionRegistParam questionRegistDto) {
-        questionService.saveQuestion(questionRegistDto);
+    public ResponseEntity<?> saveQuestion(@RequestBody @Valid QuestionRegistParam questionRegistParam) {
+        questionService.saveQuestion(questionRegistParam);
         return ResponseEntity.ok().build();
     }
 
@@ -39,8 +39,8 @@ public class QuestionController {
     @Operation(description = "문제 수정", summary = "문제 수정")
     @PutMapping(path = "/update")
     public ResponseEntity<?> updateQuestion(
-            @RequestBody @Valid QuestionUpdateParam questionUpdateDto) {
-        questionService.updateQuestion(questionUpdateDto);
+            @RequestBody @Valid QuestionUpdateParam questionUpdateParam) {
+        questionService.updateQuestion(questionUpdateParam);
         return ResponseEntity.ok().build();
     }
 
