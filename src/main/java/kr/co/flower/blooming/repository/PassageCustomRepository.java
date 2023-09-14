@@ -1,11 +1,10 @@
 package kr.co.flower.blooming.repository;
 
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import kr.co.flower.blooming.dto.out.PassageListDto;
+import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.entity.PassageType;
 
 public interface PassageCustomRepository {
@@ -45,8 +44,18 @@ public interface PassageCustomRepository {
      * @param passageName
      * @return
      */
-    Page<String> searchPassageUnitGroupByUnit(Pageable pageable, PassageType passageType,
+    Page<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
+            PassageType passageType,
             String passageYear,
             String passageName);
 
+
+    /**
+     * 지문 유형과 연도에 해당되는 교재명 목록 조회
+     * 
+     * @param passageType
+     * @param year
+     * @return
+     */
+    List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year);
 }

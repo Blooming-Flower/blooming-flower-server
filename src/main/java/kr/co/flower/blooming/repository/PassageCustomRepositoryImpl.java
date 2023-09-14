@@ -1,5 +1,7 @@
 package kr.co.flower.blooming.repository;
 
+import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
+import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -13,11 +15,10 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.flower.blooming.dto.out.PassageListDto;
+import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.dto.out.QPassageListDto;
+import kr.co.flower.blooming.dto.out.QPassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.entity.PassageType;
-
-import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
-import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -178,13 +179,15 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
      * @return
      */
     @Override
-    public Page<String> searchPassageUnitGroupByUnit(Pageable pageable, PassageType passageType,
-            String passageYear, String passageName) {
-        List<String> passageUnits = getPassageUnit(pageable, passageType, passageYear, passageName);
+    public Page<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
+            PassageType passageType, String passageYear, String passageName) {
+        List<PassageNumberAndQuestionCountDto> passageUnits =
+                getPassageUnit(pageable, passageType, passageYear, passageName);
 
         Long count = queryFactory.select(passageEntity.count())
                 .from(passageEntity)
-                .where(eqPassageType(passageType) ,eqPassageYear(passageYear), eqPassageName(passageName))
+                .where(eqPassageType(passageType), eqPassageYear(passageYear),
+                        eqPassageName(passageName))
                 .fetchOne();
 
         return PageableExecutionUtils.getPage(passageUnits, pageable,
@@ -200,15 +203,44 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
      * @param passageName
      * @return
      */
-    private List<String> getPassageUnit(Pageable pageable, PassageType passageType,
+    private List<PassageNumberAndQuestionCountDto> getPassageUnit(Pageable pageable,
+            PassageType passageType,
             String passageYear, String passageName) {
-        return queryFactory.select(passageEntity.passageUnit)
+        List<String> passageUnitGroup = queryFactory.select(passageEntity.passageUnit)
                 .from(passageEntity)
-                .where(eqPassageType(passageType) ,eqPassageYear(passageYear), eqPassageName(passageName))
+                .where(passageEntity.passageType.eq(passageType),
+                        passageEntity.passageYear.eq(passageYear),
+                        passageEntity.passageName.eq(passageName))
                 .groupBy(passageEntity.passageUnit)
-                .offset(pageable.getOffset())
+                .orderBy(passageEntity.passageUnit.length().asc(), passageEntity.passageUnit.asc())
                 .limit(pageable.getPageSize())
-                .orderBy(passageEntity.passageUnit.asc())
+                .offset(pageable.getOffset())
+                .fetch();
+
+
+        return queryFactory
+                .select(new QPassageNumberAndQuestionCountDto(
+                        passageEntity.passageUnit, passageEntity.passageNumber,
+                        questionEntity.count()))
+                .from(passageEntity)
+                .leftJoin(questionEntity)
+                .on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
+                .where(
+                        passageEntity.passageUnit.in(passageUnitGroup))
+                .groupBy(passageEntity.passageUnit, passageEntity.passageNumber)
+                .fetch();
+    }
+
+    /**
+     * 지문 유형과 연도에 해당되는 교재명 목록 조회
+     */
+    @Override
+    public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
+        return queryFactory.select(passageEntity.passageName)
+                .distinct()
+                .from(passageEntity)
+                .where(passageEntity.passageType.eq(passageType),
+                        passageEntity.passageYear.eq(year))
                 .fetch();
     }
 

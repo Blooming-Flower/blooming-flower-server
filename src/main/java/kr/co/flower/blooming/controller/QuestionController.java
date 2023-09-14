@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,10 +55,16 @@ public class QuestionController {
     @Operation(description = "연도, 교재, 강 검색조건에 따라 조회", summary = "[문제 출제] 강, 지문 번호 조회")
     @GetMapping(path = "/search/passageNumbers")
     public ResponseEntity<?> searchPassageNumbers(
-            Pageable pageable,
-            @RequestParam(required = false) PassageType passageType,
-            @RequestParam(required = false) String passageYear,
-            @RequestParam(required = false) String passageName) {
-        return null;
+            Pageable pageable, PassageType passageType, String passageYear, String passageName) {
+        return ResponseEntity.ok(questionService.searchPassageNumbers(pageable, passageType, passageYear, passageName));
+    }
+    
+    @Operation(description = "지문 유형과 연도에 해당되는 교재명 목록 조회",
+            summary = "[문제 출제] 지문 유형과 연도에 해당되는 교재명 목록 조회")
+    @GetMapping(path = "/search/year")
+    public ResponseEntity<?> searchPassageNameByTypeAndYear(PassageType passageType,
+            String year) {
+        return ResponseEntity
+                .ok(questionService.searchPassageNameByTypeAndYear(passageType, year));
     }
 }
