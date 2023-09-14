@@ -53,7 +53,7 @@ public class QuestionController {
     }
 
     @Operation(description = "연도, 교재, 강 검색조건에 따라 조회", summary = "[문제 출제] 강, 지문 번호 조회")
-    @GetMapping(path = "/search/passageNumbers")
+    @GetMapping(path = "/search/passage-numbers")
     public ResponseEntity<?> searchPassageNumbers(
             Pageable pageable, PassageType passageType, String passageYear, String passageName) {
         return ResponseEntity.ok(questionService.searchPassageNumbers(pageable, passageType, passageYear, passageName));
@@ -61,7 +61,7 @@ public class QuestionController {
     
     @Operation(description = "지문 유형과 연도에 해당되는 교재명 목록 조회",
             summary = "[문제 출제] 지문 유형과 연도에 해당되는 교재명 목록 조회")
-    @GetMapping(path = "/search/year")
+    @GetMapping(path = "/search/passage-names")
     public ResponseEntity<?> searchPassageNameByTypeAndYear(PassageType passageType,
             String year) {
         return ResponseEntity

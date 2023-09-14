@@ -76,7 +76,7 @@ public class PassageController {
     @Operation(description = "교재 종류별, 입력된 교재이름이 포함된 교재 이름 목록 검색",
             summary = "교재 종류별, 입력된 교재이름이 포함된 교재 이름 목록 검색")
     @GetMapping(path = "/search/name")
-    public ResponseEntity<?> searchPassageTitle(PassageType passageType, String passageName) {
+    public ResponseEntity<?> searchPassageNameList(PassageType passageType, String passageName) {
         return ResponseEntity.ok(passageService.searchPassageNameList(passageType, passageName));
     }
 
