@@ -231,6 +231,9 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
                 .leftJoin(questionEntity)
                 .on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
                 .where(
+                		passageEntity.passageType.eq(passageType),
+                        passageEntity.passageYear.eq(passageYear),
+                        passageEntity.passageName.eq(passageName),
                         passageEntity.passageUnit.in(passageUnitGroup))
                 .groupBy(passageEntity.passageUnit, passageEntity.passageNumber)
                 .fetch();
