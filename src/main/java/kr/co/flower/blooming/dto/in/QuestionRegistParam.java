@@ -9,6 +9,12 @@ import kr.co.flower.blooming.entity.QuestionType;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 단일 문제, 복합문제 insert dto
+ * 
+ * @author shmin
+ *
+ */
 @Getter
 @Setter
 public class QuestionRegistParam {

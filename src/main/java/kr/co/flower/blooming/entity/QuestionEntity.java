@@ -21,7 +21,6 @@ import javax.persistence.Table;
 
 import kr.co.flower.blooming.dto.in.AnswerParam;
 import kr.co.flower.blooming.dto.in.ChooseParam;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

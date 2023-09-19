@@ -9,6 +9,12 @@ import kr.co.flower.blooming.entity.QuestionType;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 단일 문제 대한 dto
+ * 
+ * @author shmin
+ *
+ */
 @Getter
 @Setter
 public class QuestionUpdateParam {

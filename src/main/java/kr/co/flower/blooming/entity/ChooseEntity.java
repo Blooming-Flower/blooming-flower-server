@@ -3,7 +3,6 @@ package kr.co.flower.blooming.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -20,7 +19,7 @@ import lombok.Data;
 @Data
 public class ChooseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private long chooseId;
     
     @Column(nullable = false)

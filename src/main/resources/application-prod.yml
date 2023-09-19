@@ -1,3 +1,8 @@
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+      
 spring:
   jpa:
     properties:
@@ -5,7 +10,7 @@ spring:
         show_sql: true
         format_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
   datasource:
     url: ${BLOOMING_FLOWER_URL}
     username: ${BLOOMING_FLOWER_NAME}

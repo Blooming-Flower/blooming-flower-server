@@ -22,6 +22,7 @@ import kr.co.flower.blooming.entity.QuestionContentEntity;
 import kr.co.flower.blooming.entity.QuestionEntity;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
+import kr.co.flower.blooming.repository.ChooseAnswerRepository;
 import kr.co.flower.blooming.repository.PassageRepository;
 import kr.co.flower.blooming.repository.QuestionContentRepository;
 import kr.co.flower.blooming.repository.QuestionRepository;
@@ -39,126 +40,142 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class QuestionService {
-	private final QuestionRepository questionRepository;
-	private final PassageRepository passageRepository;
-	private final QuestionContentRepository questionContentRepository;
+    private final QuestionRepository questionRepository;
+    private final PassageRepository passageRepository;
+    private final QuestionContentRepository questionContentRepository;
+    private final ChooseAnswerRepository chooseAnswerRepository;
 
-	/**
-	 * 문제 저장
-	 * 
-	 * @param questionRegistDto
-	 */
-	@Transactional
-	public void saveQuestion(QuestionRegistParam questionRegistParam) {
-		QuestionContentEntity questionContentEntity = new QuestionContentEntity();
-		questionContentEntity.setQuestionTitle(questionRegistParam.getQuestionTitle());
-		questionContentEntity.setQuestionContent(questionRegistParam.getQuestionContent());
-		questionContentRepository.save(questionContentEntity);
+    /**
+     * 문제 저장
+     * 
+     * @param questionRegistDto
+     */
+    @Transactional
+    public void saveQuestion(QuestionRegistParam questionRegistParam) {
+        QuestionContentEntity questionContentEntity = new QuestionContentEntity();
+        questionContentEntity.setQuestionTitle(questionRegistParam.getQuestionTitle());
+        questionContentEntity.setQuestionContent(questionRegistParam.getQuestionContent());
+        questionContentRepository.save(questionContentEntity);
 
-		PassageEntity passage = passageRepository.findById(questionRegistParam.getPassageId())
-				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+        PassageEntity passage = passageRepository.findById(questionRegistParam.getPassageId())
+                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-		UUID uuid = UUID.randomUUID();
+        UUID uuid = UUID.randomUUID();
 
-		List<QuestionParam> questionParams = questionRegistParam.getQuestionParams();
-		questionParams.forEach(question -> {
-			QuestionEntity questionEntity = new QuestionEntity();
+        List<QuestionParam> questionParams = questionRegistParam.getQuestionParams();
+        questionParams.forEach(question -> {
+            QuestionEntity questionEntity = new QuestionEntity();
 
-			questionEntity.setQuestionCode(uuid.toString());
-			questionEntity.setQuestionType(question.getQuestionType());
-			questionEntity.setQuestionSubTitle(question.getQuestionSubTitle());
-			questionEntity.setPastYn(question.isPastYn());
-			questionEntity.setSubBox(question.getSubBox());
-			questionEntity.setChooseEntities(question.getChooseList());
-			questionEntity.setAnswerEntities(question.getAnswerList());
-			questionEntity.setPassageEntity(passage);
-			questionEntity.setQuestionContentEntity(questionContentEntity);
+            questionEntity.setQuestionCode(uuid.toString());
+            questionEntity.setQuestionType(question.getQuestionType());
+            questionEntity.setQuestionSubTitle(question.getQuestionSubTitle());
+            questionEntity.setPastYn(question.isPastYn());
+            questionEntity.setSubBox(question.getSubBox());
+            questionEntity.setPassageEntity(passage);
+            questionEntity.setQuestionContentEntity(questionContentEntity);
 
-			questionRepository.save(questionEntity);
-		});
-	}
+            questionRepository.save(questionEntity);
 
-	/**
-	 * 문제 수정
-	 * 
-	 * @param questionRegistDto
-	 */
-	@Transactional
-	public void updateQuestion(QuestionUpdateParam questionUpdateParam) {
-		QuestionEntity questionEntity = questionRepository.findById(questionUpdateParam.getQuestionId())
-				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+            // choose, answer bulk insert
+            chooseAnswerRepository.bulkSaveChoose(question.getChooseList(),
+                    questionEntity.getQuestionId());
+            chooseAnswerRepository.bulkSaveAnswer(question.getAnswerList(),
+                    questionEntity.getQuestionId());
+        });
+    }
 
-		QuestionContentEntity questionContentEntity = questionEntity.getQuestionContentEntity();
-		questionContentEntity.setQuestionTitle(questionUpdateParam.getQuestionTitle());
-		questionContentEntity.setQuestionContent(questionUpdateParam.getQuestionContent());
-		questionContentRepository.save(questionContentEntity);
+    /**
+     * 문제 수정
+     * 
+     * @param questionRegistDto
+     */
+    @Transactional
+    public void updateQuestion(QuestionUpdateParam questionUpdateParam) {
+        QuestionEntity questionEntity =
+                questionRepository.findById(questionUpdateParam.getQuestionId())
+                        .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-		PassageEntity passage = passageRepository.findById(questionUpdateParam.getPassageId())
-				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+        QuestionContentEntity questionContentEntity = questionEntity.getQuestionContentEntity();
+        questionContentEntity.setQuestionTitle(questionUpdateParam.getQuestionTitle());
+        questionContentEntity.setQuestionContent(questionUpdateParam.getQuestionContent());
+        questionContentRepository.save(questionContentEntity);
 
-		questionEntity.setQuestionType(questionUpdateParam.getQuestionType());
-		questionEntity.setQuestionSubTitle(questionUpdateParam.getQuestionSubTitle());
-		questionEntity.setPastYn(questionUpdateParam.isPastYn());
-		questionEntity.setSubBox(questionUpdateParam.getSubBox());
-		questionEntity.setChooseEntities(questionUpdateParam.getChooseList());
-		questionEntity.setAnswerEntities(questionUpdateParam.getAnswerList());
-		questionEntity.setPassageEntity(passage);
-		questionEntity.setQuestionContentEntity(questionContentEntity);
+        PassageEntity passage = passageRepository.findById(questionUpdateParam.getPassageId())
+                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-		questionRepository.save(questionEntity);
+        questionEntity.setQuestionType(questionUpdateParam.getQuestionType());
+        questionEntity.setQuestionSubTitle(questionUpdateParam.getQuestionSubTitle());
+        questionEntity.setPastYn(questionUpdateParam.isPastYn());
+        questionEntity.setSubBox(questionUpdateParam.getSubBox());
+        questionEntity.setPassageEntity(passage);
+        questionEntity.setQuestionContentEntity(questionContentEntity);
 
-	}
+        questionRepository.save(questionEntity);
 
-	/**
-	 * 문제 삭제
-	 * 
-	 * @param questionId
-	 */
-	@Transactional
-	public void deleteQuestion(long questionId) {
-		questionRepository.findById(questionId).orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+        // choose, answer bulk update
+        chooseAnswerRepository.bulkUpdateChoose(questionUpdateParam.getChooseList(),
+                questionEntity.getQuestionId());
+        chooseAnswerRepository.bulkUpdateAnswer(questionUpdateParam.getAnswerList(),
+                questionEntity.getQuestionId());
 
-		questionRepository.deleteById(questionId);
-	}
+    }
 
-	/**
-	 * 검색 조건에 따라 지문 번호 - 지문 강에 따라 그루핑 하여 조회
-	 * 
-	 * 페이징 처리
-	 * 
-	 * @param pabeable
-	 * @param passageType
-	 * @param passageYear
-	 * @param passageName
-	 */
-	public List<PassageGroupByUnitDto> searchPassageNumbers(Pageable pageable, PassageType passageType,
-			String passageYear, String passageName) {
-		List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
-		// 페이징된 passage number, question count
-		List<PassageNumberAndQuestionCountDto> content = passageRepository
-				.searchPassageUnitGroupByUnit(pageable, passageType, passageYear, passageName).getContent();
+    /**
+     * 문제 삭제
+     * 
+     * @param questionId
+     */
+    @Transactional
+    public void deleteQuestion(long questionId) {
+        questionRepository.findById(questionId)
+                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-		// passage unit으로 grouping
-		Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
-				.collect(Collectors.groupingBy(PassageNumberAndQuestionCountDto::getPassageUnit));
+        chooseAnswerRepository.bulkDeleteChoose(questionId);
+        chooseAnswerRepository.bulkDeleteAnswer(questionId);
+        questionRepository.deleteById(questionId);
+    }
 
-		for (Entry<String, List<PassageNumberAndQuestionCountDto>> entry : groupByUnit.entrySet()) {
-			byUnitDtos.add(
-					PassageGroupByUnitDto.builder().passageUnit(entry.getKey()).passageInfo(entry.getValue()).build());
-		}
+    /**
+     * 검색 조건에 따라 지문 번호 - 지문 강에 따라 그루핑 하여 조회
+     * 
+     * 페이징 처리
+     * 
+     * @param pabeable
+     * @param passageType
+     * @param passageYear
+     * @param passageName
+     */
+    public List<PassageGroupByUnitDto> searchPassageNumbers(Pageable pageable,
+            PassageType passageType,
+            String passageYear, String passageName) {
+        List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
+        // 페이징된 passage number, question count
+        List<PassageNumberAndQuestionCountDto> content = passageRepository
+                .searchPassageUnitGroupByUnit(pageable, passageType, passageYear, passageName)
+                .getContent();
 
-		return byUnitDtos;
-	}
+        // passage unit으로 grouping
+        Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
+                .collect(Collectors.groupingBy(PassageNumberAndQuestionCountDto::getPassageUnit));
 
-	/**
-	 * 지문 유형과 연도에 해당되는 교재명 목록 조회
-	 * 
-	 * @param passageType
-	 * @param year
-	 * @return
-	 */
-	public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
-		return passageRepository.searchPassageNameByTypeAndYear(passageType, year);
-	}
+        for (Entry<String, List<PassageNumberAndQuestionCountDto>> entry : groupByUnit.entrySet()) {
+            byUnitDtos.add(
+                    PassageGroupByUnitDto.builder().passageUnit(entry.getKey())
+                            .passageInfo(entry.getValue()).build());
+        }
+
+        return byUnitDtos;
+    }
+
+    /**
+     * 지문 유형과 연도에 해당되는 교재명 목록 조회
+     * 
+     * @param passageType
+     * @param year
+     * @return
+     */
+    public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
+        return passageRepository.searchPassageNameByTypeAndYear(passageType, year);
+    }
 
 }

@@ -29,6 +29,8 @@ repositories {
 dependencies {
 	// jpa
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	 // JdbcTemplate
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	
 	// querydsl 디펜던시 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"

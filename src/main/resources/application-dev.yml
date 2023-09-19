@@ -1,3 +1,8 @@
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
 spring:
   jpa:
     properties:
@@ -24,6 +29,9 @@ logging:
   level:
     root: INFO
     kr.co.flower.blooming: debug
+
+    # for native query
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [%4L] - %m%n"
     file: "[%d{HH:mm:ss.SSS}][%-5level][%t][%logger.%method:line%line] - %msg%n"
