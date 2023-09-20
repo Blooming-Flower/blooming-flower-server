@@ -44,6 +44,6 @@ public class ExamEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ExamFormat examFormat; // 포맷
 
-    @OneToMany(mappedBy = "examOrderId")
+    @OneToMany(mappedBy = "examEntity")
     private List<ExamOrderEntity> examOrderEntities = new ArrayList<>();
 }

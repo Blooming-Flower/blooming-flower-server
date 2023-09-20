@@ -19,7 +19,7 @@ import lombok.Data;
  *
  */
 @Entity
-@Table(name = "EXAM_ORDERS")
+@Table(name = "EXAM_ORDER")
 @Data
 public class ExamOrderEntity {
     @Id
@@ -28,12 +28,14 @@ public class ExamOrderEntity {
 
     @Column(nullable = false)
     private int orderSeq; // 순서
+    
+    @Column(nullable = false)
+    private String passageName; // 교재명
+    
+    @Column(nullable = false)
+    private String passageYear; // 연도
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exam_id")
     private ExamEntity examEntity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "question_id")
-    private QuestionEntity questionEntity;
 }
