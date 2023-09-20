@@ -2,7 +2,6 @@ package kr.co.flower.blooming.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,8 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,5 +42,5 @@ public class ExamEntity extends BaseEntity {
     private ExamFormat examFormat; // 포맷
 
     @OneToMany(mappedBy = "examEntity")
-    private List<ExamOrderEntity> examOrderEntities = new ArrayList<>();
+    private List<ExamQuestionEntity> examQuestionEntities = new ArrayList<>();
 }
