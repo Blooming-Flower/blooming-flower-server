@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum QuestionType {
-	// TODO 유형 추가
 	Q1("주제"), Q2("제목"), Q3("목적"), Q4("심경추론"), 
 	Q5("필자의 주장"), Q6("요지"), Q7("의미추론"), Q8("지칭"), 
 	Q9("내용불일치"), Q10("내용일치"), Q11("어법"), Q12("어법ABC"),
