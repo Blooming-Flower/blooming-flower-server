@@ -45,12 +45,22 @@ public class QuestionController {
     }
 
     @ApiResponses({@ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")})
-    @Operation(description = "문제 삭제", summary = "문제 삭제")
+    @Operation(description = "문제 삭제", summary = "문제 삭제 - questionId로 삭제")
     @DeleteMapping(path = "/delete/{questionId}")
-    public ResponseEntity<?> deleteQuestion(@PathVariable(name = "questionId") long questionId) {
-        questionService.deleteQuestion(questionId);
+    public ResponseEntity<?> deleteQuestionById(@PathVariable(name = "questionId") long questionId) {
+        questionService.deleteQuestionById(questionId);
         return ResponseEntity.ok().build();
     }
+    
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")})
+    @Operation(description = "문제 삭제", summary = "문제 삭제 - questionCode로 삭제")
+    @DeleteMapping(path = "/delete")
+    public ResponseEntity<?> deleteQuestionByCode(String questionCode) {
+        questionService.deleteQuestionByCode(questionCode);
+        return ResponseEntity.ok().build();
+    }
+    
+    
 
     @Operation(description = "연도, 교재, 강 검색조건에 따라 조회", summary = "[문제 출제] 강, 지문 번호 조회")
     @GetMapping(path = "/search/passage-numbers")

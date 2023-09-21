@@ -121,18 +121,30 @@ public class QuestionService {
     }
 
     /**
-     * 문제 삭제
+     * 문제 id로 삭제
      * 
      * @param questionId
      */
     @Transactional
-    public void deleteQuestion(long questionId) {
+    public void deleteQuestionById(long questionId) {
         questionRepository.findById(questionId)
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
         chooseAnswerRepository.bulkDeleteChoose(questionId);
         chooseAnswerRepository.bulkDeleteAnswer(questionId);
         questionRepository.deleteById(questionId);
+    }
+    
+    /**
+     * 문제 코드로 삭제
+     * 
+     * @param questionId
+     */
+    @Transactional
+    public void deleteQuestionByCode(String questionCode) {
+		questionRepository.findByQuestionCode(questionCode).forEach(question -> {
+			deleteQuestionById(question.getQuestionId());
+		});
     }
 
     /**
