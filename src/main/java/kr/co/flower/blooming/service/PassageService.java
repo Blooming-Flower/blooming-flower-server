@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.co.flower.blooming.dto.in.PassageRegistParam;
 import kr.co.flower.blooming.dto.out.CheckExistPassageDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
-import kr.co.flower.blooming.dto.out.PassageNameDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDto;
 import kr.co.flower.blooming.entity.PassageEntity;
@@ -125,7 +124,7 @@ public class PassageService {
      * @param passageType
      * @param passageName
      */
-    public List<PassageNameDto> searchPassageNameList(PassageType passageType, String passageName) {
+    public List<String> searchPassageNameList(PassageType passageType, String passageName) {
         return passageRepository.searchPassageNameList(passageType, passageName);
     }
 
