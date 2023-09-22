@@ -14,8 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.co.flower.blooming.dto.in.QuestionRegistParam;
 import kr.co.flower.blooming.dto.in.QuestionRegistParam.QuestionParam;
 import kr.co.flower.blooming.dto.in.QuestionUpdateParam;
+import kr.co.flower.blooming.dto.out.ChooseDto;
 import kr.co.flower.blooming.dto.out.PassageGroupByUnitDto;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
+import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos;
+import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos.SearchQuestionDto;
+import kr.co.flower.blooming.entity.AnswerDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.entity.QuestionContentEntity;
@@ -222,6 +226,60 @@ public class QuestionService {
      */
     public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
         return passageRepository.searchPassageNameByTypeAndYear(passageType, year);
+    }
+    
+    /**
+     * 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환 
+     * 
+     * @param questionEntities
+     * @return
+     */
+    public List<SearchQuestionDtos> convertQuestionDtos(List<QuestionEntity> questionEntities){
+        List<SearchQuestionDtos> questions = new ArrayList<>();
+        
+        Map<String, List<QuestionEntity>> groupByCode = questionEntities.stream().collect(Collectors.groupingBy(QuestionEntity::getQuestionCode));
+        
+        for (Entry<String, List<QuestionEntity>> entry : groupByCode.entrySet()) {
+            String questionCode = entry.getKey();
+            List<QuestionEntity> questionByCode = entry.getValue();
+
+            SearchQuestionDtos searchQuestionDtos = new SearchQuestionDtos();
+            searchQuestionDtos.setQuestionCode(questionCode);
+            searchQuestionDtos.setQuestionTitle(
+                    questionByCode.get(0).getQuestionContentEntity().getQuestionTitle());
+            searchQuestionDtos.setQuestionContent(
+                    questionByCode.get(0).getQuestionContentEntity().getQuestionContent());
+
+            List<SearchQuestionDto> searchQuestionDto = new ArrayList<>();
+            for (QuestionEntity question : questionByCode) {
+                SearchQuestionDto questionDto = new SearchQuestionDto();
+                questionDto.setQuestionId(question.getQuestionId());
+                questionDto.setQuestionType(question.getQuestionType());
+                questionDto.setQuestionSubTitle(question.getQuestionSubTitle());
+                questionDto.setSubBox(question.getSubBox());
+                questionDto.setPastYn(question.isPastYn());
+                questionDto.setChoose(question.getChooseEntities().stream().map(choose -> {
+                    ChooseDto chooseDto = new ChooseDto();
+                    chooseDto.setSeq(choose.getChooseSeq());
+                    chooseDto.setContent(choose.getChooseContent());
+
+                    return chooseDto;
+                }).collect(Collectors.toList()));
+                questionDto.setAnswer(question.getAnswerEntities().stream().map(answer -> {
+                    AnswerDto answerDto = new AnswerDto();
+                    answerDto.setContent(answer.getAnswerContent());
+
+                    return answerDto;
+                }).collect(Collectors.toList()));
+
+                searchQuestionDto.add(questionDto);
+            }
+
+            searchQuestionDtos.setQuestion(searchQuestionDto);
+            questions.add(searchQuestionDtos);
+        }
+        
+        return questions;
     }
 
 }

@@ -1,27 +1,17 @@
 package kr.co.flower.blooming.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import kr.co.flower.blooming.dto.in.PassageRegistParam;
 import kr.co.flower.blooming.dto.out.CheckExistPassageDto;
-import kr.co.flower.blooming.dto.out.ChooseDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos;
-import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos.SearchQuestionDto;
-import kr.co.flower.blooming.entity.AnswerDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
-import kr.co.flower.blooming.entity.QuestionEntity;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
 import kr.co.flower.blooming.repository.PassageRepository;
@@ -40,7 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PassageService {
     private final PassageRepository passageRepository;
-
+    private final QuestionService questionService;
+    
     /**
      * 지문 저장
      * 
@@ -90,55 +81,11 @@ public class PassageService {
     public SearchPassageDto searchPassageInfo(long passageId) {
         PassageEntity passage = passageRepository.findById(passageId)
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+      
+        // 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환 
+        List<SearchQuestionDtos> questions = questionService.convertQuestionDtos(passage.getQuestionEntities());
 
         SearchPassageDto searchPassageDto = new SearchPassageDto();
-        List<SearchQuestionDtos> questions = new ArrayList<>();
-
-        // code 별로 questionEntity grouping
-        List<QuestionEntity> questionEntities = passage.getQuestionEntities();
-        Map<String, List<QuestionEntity>> groupByCode = questionEntities.stream()
-                .collect(Collectors.groupingBy(QuestionEntity::getQuestionCode));
-
-        for (Entry<String, List<QuestionEntity>> entry : groupByCode.entrySet()) {
-            String questionCode = entry.getKey();
-            List<QuestionEntity> questionByCode = entry.getValue();
-
-            SearchQuestionDtos searchQuestionDtos = new SearchQuestionDtos();
-            searchQuestionDtos.setQuestionCode(questionCode);
-            searchQuestionDtos.setQuestionTitle(
-                    questionByCode.get(0).getQuestionContentEntity().getQuestionTitle());
-            searchQuestionDtos.setQuestionContent(
-                    questionByCode.get(0).getQuestionContentEntity().getQuestionContent());
-
-            List<SearchQuestionDto> searchQuestionDto = new ArrayList<>();
-            for (QuestionEntity question : questionByCode) {
-                SearchQuestionDto questionDto = new SearchQuestionDto();
-                questionDto.setQuestionId(question.getQuestionId());
-                questionDto.setQuestionType(question.getQuestionType());
-                questionDto.setQuestionSubTitle(question.getQuestionSubTitle());
-                questionDto.setSubBox(question.getSubBox());
-                questionDto.setPastYn(question.isPastYn());
-                questionDto.setChoose(question.getChooseEntities().stream().map(choose -> {
-                    ChooseDto chooseDto = new ChooseDto();
-                    chooseDto.setSeq(choose.getChooseSeq());
-                    chooseDto.setContent(choose.getChooseContent());
-
-                    return chooseDto;
-                }).collect(Collectors.toList()));
-                questionDto.setAnswer(question.getAnswerEntities().stream().map(answer -> {
-                    AnswerDto answerDto = new AnswerDto();
-                    answerDto.setContent(answer.getAnswerContent());
-
-                    return answerDto;
-                }).collect(Collectors.toList()));
-
-                searchQuestionDto.add(questionDto);
-            }
-
-            searchQuestionDtos.setQuestion(searchQuestionDto);
-            questions.add(searchQuestionDtos);
-        }
-
         searchPassageDto.setPassageContent(passage.getPassageContent());
         searchPassageDto.setQuestions(questions);
 

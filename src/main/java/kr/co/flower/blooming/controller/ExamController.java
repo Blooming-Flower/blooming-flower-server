@@ -34,7 +34,7 @@ public class ExamController {
         return ResponseEntity.ok(examService.getQuestionIdAndCount(questionTypeParam));
     }
 
-    @ApiResponses({@ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.")})
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "시험지를 찾을 수 없습니다.")})
     @Operation(description = "시험지 제작", summary = "[시험지] 시험지 제작")
     @PostMapping(path = "/make")
     public ResponseEntity<?> makeExam(@RequestBody MakeExamParam examParam) {
@@ -42,10 +42,7 @@ public class ExamController {
         return ResponseEntity.ok().build();
     }
 
-    // TODO 시험지에 있는 문제들 불러오기
-
-    // 시험지 삭제
-    @ApiResponses({@ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.")})
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "시험지를 찾을 수 없습니다.")})
     @Operation(description = "시험지 삭제", summary = "[시험지] 시험지 삭제")
     @DeleteMapping(path = "/delete/{examId}")
     public ResponseEntity<?> deleteExam(@PathVariable(name = "examId") long examId) {
@@ -53,11 +50,20 @@ public class ExamController {
         return ResponseEntity.ok().build();
     }
 
-    @ApiResponses({@ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.")})
     @Operation(description = "시험지 목록 조회", summary = "[시험지] 시험지 목록 조회")
     @GetMapping(path = "/search")
     public ResponseEntity<?> searchExam(Pageable pageable,
             @RequestParam(required = false) String examTitle) {
         return ResponseEntity.ok(examService.findExamList(pageable, examTitle));
     }
+    
+    // TODO 시험지에 있는 문제들 불러오기
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "시험지를 찾을 수 없습니다.")})
+    @Operation(description = "시험지에 있는 문제들 불러오기", summary = "[시험지] 시험지에 있는 문제들 불러오기")
+    @GetMapping(path = "/load/{examId}")
+    public ResponseEntity<?> loadExam(@PathVariable(name = "examId") long examId) {
+        return ResponseEntity.ok(examService.loadExam(examId));
+    }
+    
+    // TODO 시험지 답안 불러오기
 }
