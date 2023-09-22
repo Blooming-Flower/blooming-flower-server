@@ -13,6 +13,7 @@ import kr.co.flower.blooming.dto.in.MakeExamParam;
 import kr.co.flower.blooming.dto.in.QuestionTypeParam;
 import kr.co.flower.blooming.dto.out.ExamListDto;
 import kr.co.flower.blooming.dto.out.ExamPagesDto;
+import kr.co.flower.blooming.dto.out.ExamPagesDto.ExamPageGroupDto;
 import kr.co.flower.blooming.dto.out.QuestionIdAndCountDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos;
 import kr.co.flower.blooming.entity.ExamEntity;
@@ -76,6 +77,7 @@ public class ExamService {
         examEntity.setExamLeftFooter(examParam.getLeftFooter());
         examEntity.setExamRightFooter(examParam.getRightFooter());
         examEntity.setExamFormat(examParam.getExamFormat());
+        
 
 
         List<ExamQuestionEntity> examQuestionEntities =
@@ -88,7 +90,8 @@ public class ExamService {
                     examQuestionEntity.setExamEntity(examEntity);
                     examQuestionEntity.setQuestionEntity(questionEntity);
                     examQuestionEntity.setGroupSeq(examQuestion.getGroupSeq());
-
+                    examQuestionEntity.setGroupName(examQuestion.getGroupName());
+                    
                     return examQuestionEntity;
                 }).collect(Collectors.toList());
 
@@ -131,7 +134,7 @@ public class ExamService {
 
         
         // 문제들 섞는 로직
-        List<SearchQuestionDtos> questionResult = new ArrayList<>();
+        List<ExamPageGroupDto> examQuestions = new ArrayList<>();
         Map<Integer, List<ExamQuestionEntity>> questionGroup = examQuestionEntities.stream()
                 .collect(Collectors.groupingBy(ExamQuestionEntity::getGroupSeq));
         
@@ -146,7 +149,10 @@ public class ExamService {
             // shuffle
             Collections.shuffle(questions);
             
-            questionResult.addAll(questions);
+            ExamPageGroupDto examPageGroupDto = new ExamPageGroupDto();
+            examPageGroupDto.setGroupName(questionGroup.get(seq).get(0).getGroupName());
+            examPageGroupDto.setQuestions(questions);
+            examQuestions.add(examPageGroupDto);
         }
 
         ExamPagesDto examPagesDto = new ExamPagesDto();
@@ -155,7 +161,7 @@ public class ExamService {
         examPagesDto.setLeftFooter(examEntity.getExamLeftFooter());
         examPagesDto.setRightFooter(examEntity.getExamRightFooter());
         examPagesDto.setExamFormat(examEntity.getExamFormat());
-        examPagesDto.setQuestions(questionResult);
+        examPagesDto.setExamQuestions(examQuestions);
 
         return examPagesDto;
     }

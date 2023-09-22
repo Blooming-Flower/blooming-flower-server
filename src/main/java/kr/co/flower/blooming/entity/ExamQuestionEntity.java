@@ -24,6 +24,8 @@ public class ExamQuestionEntity {
     private long examQuestionId;
 
     private int groupSeq; // 교재별 순서 번호
+    
+    private String groupName; // 교재명(연도)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")

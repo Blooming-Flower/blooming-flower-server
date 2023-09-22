@@ -22,6 +22,18 @@ public class ExamPagesDto {
     private String rightFooter; // 꼬리말(오)
     private ExamFormat examFormat; // 포맷
 
-    // 문제 list
-    private List<SearchQuestionDtos> questions = new ArrayList<>();
+    private List<ExamPageGroupDto> examQuestions = new ArrayList<>();
+    /**
+     * 시험지 만들 때 교재명(연도)로 grouping 한 대로 뿌려줌
+     * 
+     * @author shmin
+     *
+     */
+    @Getter
+    @Setter
+    public static class ExamPageGroupDto {
+        private String groupName;
+        // 문제 list
+        private List<SearchQuestionDtos> questions = new ArrayList<>();
+    }
 }

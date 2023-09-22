@@ -24,5 +24,6 @@ public class MakeExamParam {
     public static class ExamQuestionParam {
         private long questionId; // 문제 id
         private int groupSeq; // 그룹(교재명) 순서
+        private String groupName; // 교재명(연도)
     }
 }
