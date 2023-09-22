@@ -20,7 +20,6 @@ import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.entity.QuestionContentEntity;
 import kr.co.flower.blooming.entity.QuestionEntity;
-import kr.co.flower.blooming.entity.QuestionType;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
 import kr.co.flower.blooming.repository.ChooseAnswerRepository;
