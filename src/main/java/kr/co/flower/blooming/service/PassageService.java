@@ -1,7 +1,9 @@
 package kr.co.flower.blooming.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -11,9 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.flower.blooming.dto.in.PassageRegistParam;
 import kr.co.flower.blooming.dto.out.CheckExistPassageDto;
+import kr.co.flower.blooming.dto.out.ChooseDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto;
-import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDto;
+import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos;
+import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos.SearchQuestionDto;
+import kr.co.flower.blooming.entity.AnswerDto;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.entity.QuestionEntity;
@@ -83,25 +88,59 @@ public class PassageService {
      * @return
      */
     public SearchPassageDto searchPassageInfo(long passageId) {
-        SearchPassageDto searchPassageDto = new SearchPassageDto();
-
         PassageEntity passage = passageRepository.findById(passageId)
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
+        SearchPassageDto searchPassageDto = new SearchPassageDto();
+        List<SearchQuestionDtos> questions = new ArrayList<>();
+
+        // code 별로 questionEntity grouping
         List<QuestionEntity> questionEntities = passage.getQuestionEntities();
+        Map<String, List<QuestionEntity>> groupByCode = questionEntities.stream()
+                .collect(Collectors.groupingBy(QuestionEntity::getQuestionCode));
 
-        Map<String, List<SearchQuestionDto>> collect = questionEntities.stream()
-                .collect(Collectors.groupingBy(QuestionEntity::getQuestionCode,
-                        Collectors.mapping(q -> {
-                            SearchQuestionDto searchQuestionDto = new SearchQuestionDto();
-                            searchQuestionDto.setQuestionType(q.getQuestionType());
-                            searchQuestionDto.setQuestionId(q.getQuestionId());
+        for (Entry<String, List<QuestionEntity>> entry : groupByCode.entrySet()) {
+            String questionCode = entry.getKey();
+            List<QuestionEntity> questionByCode = entry.getValue();
 
-                            return searchQuestionDto;
-                        }, Collectors.toList())));
+            SearchQuestionDtos searchQuestionDtos = new SearchQuestionDtos();
+            searchQuestionDtos.setQuestionCode(questionCode);
+            searchQuestionDtos.setQuestionTitle(
+                    questionByCode.get(0).getQuestionContentEntity().getQuestionTitle());
+            searchQuestionDtos.setQuestionContent(
+                    questionByCode.get(0).getQuestionContentEntity().getQuestionContent());
+
+            List<SearchQuestionDto> searchQuestionDto = new ArrayList<>();
+            for (QuestionEntity question : questionByCode) {
+                SearchQuestionDto questionDto = new SearchQuestionDto();
+                questionDto.setQuestionId(question.getQuestionId());
+                questionDto.setQuestionType(question.getQuestionType());
+                questionDto.setQuestionSubTitle(question.getQuestionSubTitle());
+                questionDto.setSubBox(question.getSubBox());
+                questionDto.setPastYn(question.isPastYn());
+                questionDto.setChoose(question.getChooseEntities().stream().map(choose -> {
+                    ChooseDto chooseDto = new ChooseDto();
+                    chooseDto.setSeq(choose.getChooseSeq());
+                    chooseDto.setContent(choose.getChooseContent());
+
+                    return chooseDto;
+                }).collect(Collectors.toList()));
+                questionDto.setAnswer(question.getAnswerEntities().stream().map(answer -> {
+                    AnswerDto answerDto = new AnswerDto();
+                    answerDto.setContent(answer.getAnswerContent());
+
+                    return answerDto;
+                }).collect(Collectors.toList()));
+
+                searchQuestionDto.add(questionDto);
+            }
+
+            searchQuestionDtos.setQuestion(searchQuestionDto);
+            questions.add(searchQuestionDtos);
+        }
 
         searchPassageDto.setPassageContent(passage.getPassageContent());
-        searchPassageDto.setQuestions(collect);
+        searchPassageDto.setQuestions(questions);
 
         return searchPassageDto;
     }
@@ -117,7 +156,6 @@ public class PassageService {
         return passageRepository.findPassageAll(pageable, passageYear, passageName);
     }
 
-
     /**
      * 교재 종류에 따라 현재 작성된 교재 이름이 포함된 교재 이름 목록 조회
      * 
@@ -128,13 +166,21 @@ public class PassageService {
         return passageRepository.searchPassageNameList(passageType, passageName);
     }
 
-    public CheckExistPassageDto checkExistPassage(
-            PassageType passageType,
-            String passageYear,
+    /**
+     * 같은 지문의 종류, 연도, 교재, 강, 번호에 대해선 유니크 해야 한다.
+     * 
+     * @param passageType
+     * @param passageYear
+     * @param passageName
+     * @param passageUnit
+     * @param passageNumber
+     * @return
+     */
+    public CheckExistPassageDto checkExistPassage(PassageType passageType, String passageYear,
             String passageName,
-            String passageUnit,
-            String passageNumber) {
-        return passageRepository.checkExistPassage(passageType, passageYear, passageName, passageUnit, passageNumber);
+            String passageUnit, String passageNumber) {
+        return passageRepository.checkExistPassage(passageType, passageYear, passageName,
+                passageUnit, passageNumber);
     }
 
     private void setPassageEntity(PassageEntity passageEntity,

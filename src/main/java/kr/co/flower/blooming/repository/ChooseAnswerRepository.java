@@ -26,7 +26,7 @@ public class ChooseAnswerRepository {
      */
     public void bulkSaveChoose(List<ChooseParam> chooseList, long questionId) {
         jdbcTemplate.batchUpdate(
-                "insert into Choose (choose_seq, choose_content, question_id) values(?,?,?)",
+                "insert into choose (choose_seq, choose_content, question_id) values(?,?,?)",
                 chooseList, 5,
                 (ps, choose) -> {
                     ps.setLong(1, choose.getChooseSeq());
@@ -43,7 +43,7 @@ public class ChooseAnswerRepository {
      */
     public void bulkSaveAnswer(List<AnswerParam> answerList, long questionId) {
         jdbcTemplate.batchUpdate(
-                "insert into Answer (answer_content, question_id) values(?,?)",
+                "insert into answer (answer_content, question_id) values(?,?)",
                 answerList, 5,
                 (ps, answer) -> {
                     ps.setString(1, answer.getAnswerContent());
