@@ -2,10 +2,12 @@ package kr.co.flower.blooming.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,6 +43,6 @@ public class ExamEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ExamFormat examFormat; // 포맷
 
-    @OneToMany(mappedBy = "examEntity")
+    @OneToMany(mappedBy = "examEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ExamQuestionEntity> examQuestionEntities = new ArrayList<>();
 }

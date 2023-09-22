@@ -1,9 +1,14 @@
 package kr.co.flower.blooming.controller;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,16 +36,28 @@ public class ExamController {
 
     @ApiResponses({@ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.")})
     @Operation(description = "시험지 제작", summary = "[시험지] 시험지 제작")
-    @PostMapping(path = "/make/exam")
+    @PostMapping(path = "/make")
     public ResponseEntity<?> makeExam(@RequestBody MakeExamParam examParam) {
         examService.makeExam(examParam);
         return ResponseEntity.ok().build();
     }
 
-    // 시험지에 있는 문제들 불러오기
+    // TODO 시험지에 있는 문제들 불러오기
 
     // 시험지 삭제
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.")})
+    @Operation(description = "시험지 삭제", summary = "[시험지] 시험지 삭제")
+    @DeleteMapping(path = "/delete/{examId}")
+    public ResponseEntity<?> deleteExam(@PathVariable(name = "examId") long examId) {
+        examService.deleteExam(examId);
+        return ResponseEntity.ok().build();
+    }
 
-    // 시험지 목록 보기
-
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "문제를 찾을 수 없습니다.")})
+    @Operation(description = "시험지 목록 조회", summary = "[시험지] 시험지 목록 조회")
+    @GetMapping(path = "/search")
+    public ResponseEntity<?> searchExam(Pageable pageable,
+            @RequestParam(required = false) String examTitle) {
+        return ResponseEntity.ok(examService.findExamList(pageable, examTitle));
+    }
 }
