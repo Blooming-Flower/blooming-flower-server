@@ -20,6 +20,7 @@ import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.entity.QuestionContentEntity;
 import kr.co.flower.blooming.entity.QuestionEntity;
+import kr.co.flower.blooming.entity.QuestionType;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
 import kr.co.flower.blooming.repository.ChooseAnswerRepository;
@@ -91,15 +92,53 @@ public class QuestionService {
      */
     @Transactional
     public void updateQuestion(QuestionUpdateParam questionUpdateParam) {
-        QuestionEntity questionEntity =
-                questionRepository.findById(questionUpdateParam.getQuestionId())
-                        .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+        // question code로 question entity 조회
+        List<QuestionEntity> questionEntityByCode =
+                questionRepository.findByQuestionCode(questionUpdateParam.getQuestionCode());
 
+        if(questionEntityByCode.isEmpty()) {
+            throw new FlowerException(FlowerError.ENTITY_NOT_FOUND);
+        }
+        
+        if (questionEntityByCode.size() > 1) {
+            // 복합 지문
+            if (questionUpdateParam.getQuestionId() == 0) {
+                // 복합 지문 -> question title, question content 만 수정
+                updateQuestionContent(questionEntityByCode.get(0), questionUpdateParam);
+            } else {
+                // 문제 수정
+                QuestionEntity questionEntity =
+                        questionRepository.findById(questionUpdateParam.getQuestionId())
+                                .orElseThrow(
+                                        () -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+                updateQuestionOne(questionEntity, questionUpdateParam);
+            }
+        } else {
+            // 단일 지문 -> title, content, 문제 수정
+            QuestionEntity questionEntity =
+                    questionRepository.findById(questionUpdateParam.getQuestionId())
+                            .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+
+            updateQuestionContent(questionEntity, questionUpdateParam);
+            updateQuestionOne(questionEntity, questionUpdateParam);
+        }
+    }
+
+    /**
+     * 문제의 title, content 수정
+     */
+    private void updateQuestionContent(QuestionEntity questionEntity,
+            QuestionUpdateParam questionUpdateParam) {
         QuestionContentEntity questionContentEntity = questionEntity.getQuestionContentEntity();
         questionContentEntity.setQuestionTitle(questionUpdateParam.getQuestionTitle());
         questionContentEntity.setQuestionContent(questionUpdateParam.getQuestionContent());
-        questionContentRepository.save(questionContentEntity);
+    }
 
+    /**
+     * 단일 문제 수정
+     */
+    private void updateQuestionOne(QuestionEntity questionEntity,
+            QuestionUpdateParam questionUpdateParam) {
         PassageEntity passage = passageRepository.findById(questionUpdateParam.getPassageId())
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
@@ -108,16 +147,12 @@ public class QuestionService {
         questionEntity.setPastYn(questionUpdateParam.isPastYn());
         questionEntity.setSubBox(questionUpdateParam.getSubBox());
         questionEntity.setPassageEntity(passage);
-        questionEntity.setQuestionContentEntity(questionContentEntity);
-
-        questionRepository.save(questionEntity);
 
         // choose, answer bulk update
         chooseAnswerRepository.bulkUpdateChoose(questionUpdateParam.getChooseList(),
                 questionEntity.getQuestionId());
         chooseAnswerRepository.bulkUpdateAnswer(questionUpdateParam.getAnswerList(),
                 questionEntity.getQuestionId());
-
     }
 
     /**
@@ -134,7 +169,7 @@ public class QuestionService {
         chooseAnswerRepository.bulkDeleteAnswer(questionId);
         questionRepository.deleteById(questionId);
     }
-    
+
     /**
      * 문제 코드로 삭제
      * 
@@ -142,9 +177,9 @@ public class QuestionService {
      */
     @Transactional
     public void deleteQuestionByCode(String questionCode) {
-		questionRepository.findByQuestionCode(questionCode).forEach(question -> {
-			deleteQuestionById(question.getQuestionId());
-		});
+        questionRepository.findByQuestionCode(questionCode).forEach(question -> {
+            deleteQuestionById(question.getQuestionId());
+        });
     }
 
     /**

@@ -18,6 +18,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class QuestionUpdateParam {
+    private String questionCode; // 지문 code
+    
 	private long questionId;
 	
 	private long passageId; // 지문 id

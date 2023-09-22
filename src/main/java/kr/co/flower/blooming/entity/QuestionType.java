@@ -13,5 +13,5 @@ public enum QuestionType {
 	Q17("주어진 문장"), Q18("요약문"), Q19("연결사"), Q20("서술(해석영작)"), 
 	Q21("서술(단어빈칸)"), Q22("서술(빈칸)");
 
-	private String questionType;
+    private String questionType;
 }
