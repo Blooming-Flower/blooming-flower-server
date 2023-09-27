@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,8 @@ import kr.co.flower.blooming.dto.in.QuestionRegistParam;
 import kr.co.flower.blooming.dto.in.QuestionRegistParam.QuestionParam;
 import kr.co.flower.blooming.dto.in.QuestionUpdateParam;
 import kr.co.flower.blooming.dto.out.ChooseDto;
-import kr.co.flower.blooming.dto.out.PassageGroupByUnitDto;
+import kr.co.flower.blooming.dto.out.PassageGroupByUnitPageDto;
+import kr.co.flower.blooming.dto.out.PassageGroupByUnitPageDto.PassageGroupByUnitDto;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos.SearchQuestionDto;
@@ -99,10 +100,10 @@ public class QuestionService {
         List<QuestionEntity> questionEntityByCode =
                 questionRepository.findByQuestionCode(questionUpdateParam.getQuestionCode());
 
-        if(questionEntityByCode.isEmpty()) {
+        if (questionEntityByCode.isEmpty()) {
             throw new FlowerException(FlowerError.ENTITY_NOT_FOUND);
         }
-        
+
         if (questionEntityByCode.size() > 1) {
             // 복합 지문
             if (questionUpdateParam.getQuestionId() == 0) {
@@ -111,7 +112,7 @@ public class QuestionService {
                 return;
             }
         }
-        
+
         // 단일 지문 -> title, content, 문제 수정
         QuestionEntity questionEntity =
                 questionRepository.findById(questionUpdateParam.getQuestionId())
@@ -189,14 +190,16 @@ public class QuestionService {
      * @param passageYear
      * @param passageName
      */
-    public List<PassageGroupByUnitDto> searchPassageNumbers(Pageable pageable,
+    public PassageGroupByUnitPageDto searchPassageNumbers(Pageable pageable,
             PassageType passageType,
             String passageYear, String passageName) {
+        PassageGroupByUnitPageDto groupByUnitPageDto = new PassageGroupByUnitPageDto();
         List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
+
         // 페이징된 passage number, question count
-        List<PassageNumberAndQuestionCountDto> content = passageRepository
-                .searchPassageUnitGroupByUnit(pageable, passageType, passageYear, passageName)
-                .getContent();
+        Page<PassageNumberAndQuestionCountDto> searchPage = passageRepository
+                .searchPassageUnitGroupByUnit(pageable, passageType, passageYear, passageName);
+        List<PassageNumberAndQuestionCountDto> content = searchPage.getContent();
 
         // passage unit으로 grouping
         Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
@@ -208,7 +211,10 @@ public class QuestionService {
                             .passageInfo(entry.getValue()).build());
         }
 
-        return byUnitDtos;
+        groupByUnitPageDto.setList(byUnitDtos);
+        groupByUnitPageDto.setPageSize(searchPage.getTotalPages());
+
+        return groupByUnitPageDto;
     }
 
     /**
@@ -221,18 +227,19 @@ public class QuestionService {
     public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
         return passageRepository.searchPassageNameByTypeAndYear(passageType, year);
     }
-    
+
     /**
-     * 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환 
+     * 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환
      * 
      * @param questionEntities
      * @return
      */
-    public List<SearchQuestionDtos> convertQuestionDtos(List<QuestionEntity> questionEntities){
+    public List<SearchQuestionDtos> convertQuestionDtos(List<QuestionEntity> questionEntities) {
         List<SearchQuestionDtos> questions = new ArrayList<>();
-        
-        Map<String, List<QuestionEntity>> groupByCode = questionEntities.stream().collect(Collectors.groupingBy(QuestionEntity::getQuestionCode));
-        
+
+        Map<String, List<QuestionEntity>> groupByCode = questionEntities.stream()
+                .collect(Collectors.groupingBy(QuestionEntity::getQuestionCode));
+
         for (Entry<String, List<QuestionEntity>> entry : groupByCode.entrySet()) {
             String questionCode = entry.getKey();
             List<QuestionEntity> questionByCode = entry.getValue();
@@ -272,7 +279,7 @@ public class QuestionService {
             searchQuestionDtos.setQuestion(searchQuestionDto);
             questions.add(searchQuestionDtos);
         }
-        
+
         return questions;
     }
 
