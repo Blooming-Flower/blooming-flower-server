@@ -108,23 +108,17 @@ public class QuestionService {
             if (questionUpdateParam.getQuestionId() == 0) {
                 // 복합 지문 -> question title, question content 만 수정
                 updateQuestionContent(questionEntityByCode.get(0), questionUpdateParam);
-            } else {
-                // 문제 수정
-                QuestionEntity questionEntity =
-                        questionRepository.findById(questionUpdateParam.getQuestionId())
-                                .orElseThrow(
-                                        () -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
-                updateQuestionOne(questionEntity, questionUpdateParam);
+                return;
             }
-        } else {
-            // 단일 지문 -> title, content, 문제 수정
-            QuestionEntity questionEntity =
-                    questionRepository.findById(questionUpdateParam.getQuestionId())
-                            .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
-
-            updateQuestionContent(questionEntity, questionUpdateParam);
-            updateQuestionOne(questionEntity, questionUpdateParam);
         }
+        
+        // 단일 지문 -> title, content, 문제 수정
+        QuestionEntity questionEntity =
+                questionRepository.findById(questionUpdateParam.getQuestionId())
+                        .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+
+        updateQuestionContent(questionEntity, questionUpdateParam);
+        updateQuestionOne(questionEntity, questionUpdateParam);
     }
 
     /**

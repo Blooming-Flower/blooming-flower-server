@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import kr.co.flower.blooming.dto.in.PassageContentUpdateParam;
 import kr.co.flower.blooming.dto.in.PassageRegistParam;
 import kr.co.flower.blooming.dto.out.CheckExistPassageDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PassageService {
     private final PassageRepository passageRepository;
     private final QuestionService questionService;
-    
+
     /**
      * 지문 저장
      * 
@@ -60,6 +61,20 @@ public class PassageService {
     }
 
     /**
+     * 원본 지문만 수정
+     * 
+     * @param passageContentUpdateParam
+     */
+    @Transactional
+    public void updatePassageContent(PassageContentUpdateParam passageContentUpdateParam) {
+        PassageEntity passageEntity =
+                passageRepository.findById(passageContentUpdateParam.getPassageId())
+                        .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+
+        passageEntity.setPassageContent(passageContentUpdateParam.getPassageContent());
+    }
+
+    /**
      * 지문 삭제
      * 
      * @param passageId
@@ -81,11 +96,13 @@ public class PassageService {
     public SearchPassageDto searchPassageInfo(long passageId) {
         PassageEntity passage = passageRepository.findById(passageId)
                 .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
-      
-        // 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환 
-        List<SearchQuestionDtos> questions = questionService.convertQuestionDtos(passage.getQuestionEntities());
+
+        // 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환
+        List<SearchQuestionDtos> questions =
+                questionService.convertQuestionDtos(passage.getQuestionEntities());
 
         SearchPassageDto searchPassageDto = new SearchPassageDto();
+        searchPassageDto.setPassageId(passage.getPassageId());
         searchPassageDto.setPassageContent(passage.getPassageContent());
         searchPassageDto.setQuestions(questions);
 

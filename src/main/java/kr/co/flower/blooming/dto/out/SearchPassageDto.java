@@ -42,6 +42,7 @@ import lombok.Data;
  */
 @Data
 public class SearchPassageDto {
+    private long passageId;
 	private String passageContent;
 	private List<SearchQuestionDtos> questions = new ArrayList<>();
 

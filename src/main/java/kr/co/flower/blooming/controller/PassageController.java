@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.flower.blooming.dto.in.PassageContentUpdateParam;
 import kr.co.flower.blooming.dto.in.PassageRegistParam;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.entity.PassageType;
@@ -33,7 +34,8 @@ public class PassageController {
 
     @Operation(description = "지문 저장", summary = "지문 저장")
     @PostMapping(path = "/save")
-    public ResponseEntity<?> savePassage(@RequestBody @Valid PassageRegistParam passageRegistParam) {
+    public ResponseEntity<?> savePassage(
+            @RequestBody @Valid PassageRegistParam passageRegistParam) {
         passageService.savePassage(passageRegistParam);
         return ResponseEntity.ok().build();
     }
@@ -44,6 +46,15 @@ public class PassageController {
     public ResponseEntity<?> updatePassage(
             @RequestBody @Valid PassageRegistParam passageRegistParam) {
         passageService.updatePassage(passageRegistParam);
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiResponses({@ApiResponse(responseCode = "404", description = "지문을 찾을 수 없습니다.")})
+    @Operation(description = "원본 지문만 수정", summary = "원본 지문만 수정")
+    @PutMapping(path = "/update/content")
+    public ResponseEntity<?> updatePassageContent(
+            @RequestBody @Valid PassageContentUpdateParam passageContentUpdateParam) {
+        passageService.updatePassageContent(passageContentUpdateParam);
         return ResponseEntity.ok().build();
     }
 
