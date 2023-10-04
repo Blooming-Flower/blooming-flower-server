@@ -1,6 +1,9 @@
 package kr.co.flower.blooming.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,7 +34,7 @@ public class QuestionController {
 
     @Operation(description = "문제 저장", summary = "문제 저장")
     @PostMapping(path = "/save")
-    public ResponseEntity<?> saveQuestion(@RequestBody @Valid QuestionRegistParam questionRegistParam) {
+    public ResponseEntity<?> saveQuestion(@RequestBody @Valid List<QuestionRegistParam> questionRegistParam) {
         questionService.saveQuestion(questionRegistParam);
         return ResponseEntity.ok().build();
     }

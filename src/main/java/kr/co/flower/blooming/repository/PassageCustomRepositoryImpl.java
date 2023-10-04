@@ -26,253 +26,210 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 
-    private final JPAQueryFactory queryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    /**
-     * 동적 검색 쿼리. filter, order에 따라 paging
-     * 
-     * @param pageable
-     * @param passageType
-     * @param passageYear
-     * @param passageName
-     * @param passageUnit
-     * @param passageNumber
-     * @return
-     */
-    @Override
-    public Page<PassageListDto> findPassageAll(Pageable pageable, String passageYear,
-            String passageName) {
-        List<PassageListDto> content = getPassageListDto(pageable, passageYear, passageName);
+	/**
+	 * 동적 검색 쿼리. filter, order에 따라 paging
+	 * 
+	 * @param pageable
+	 * @param passageType
+	 * @param passageYear
+	 * @param passageName
+	 * @param passageUnit
+	 * @param passageNumber
+	 * @return
+	 */
+	@Override
+	public Page<PassageListDto> findPassageAll(Pageable pageable, String passageYear, String passageName) {
+		List<PassageListDto> content = getPassageListDto(pageable, passageYear, passageName);
 
-        Long count = queryFactory.select(passageEntity.count())
-                .from(passageEntity)
-                .where(eqPassageYear(passageYear), containsPassageName(passageName))
-                .fetchOne();
+		Long count = queryFactory.select(passageEntity.count()).from(passageEntity)
+				.where(eqPassageYear(passageYear), containsPassageName(passageName)).fetchOne();
 
-        return PageableExecutionUtils.getPage(content, pageable,
-                () -> count);
-    }
+		return PageableExecutionUtils.getPage(content, pageable, () -> count);
+	}
 
-    /**
-     * content를 가져옴
-     * 
-     * @param pageable
-     * @param passageType
-     * @param passageYear
-     * @param passageName
-     * @param passageUnit
-     * @param passageNumber
-     * @return passageEntity.questionEntities.size()
-     */
-    private List<PassageListDto> getPassageListDto(Pageable pageable, String passageYear,
-            String passageName) {
-        return queryFactory
-                .select(new QPassageListDto(passageEntity.passageId, passageEntity.passageType,
-                        passageEntity.passageName,
-                        passageEntity.passageUnit, passageEntity.passageNumber,
-                        JPAExpressions.select(questionEntity.count()).from(questionEntity)
-                                .where(passageEntity.passageId
-                                        .eq(questionEntity.passageEntity.passageId))))
-                .from(passageEntity)
-                .where(eqPassageYear(passageYear), containsPassageName(passageName))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(passageEntity.passageName.asc(),
-                        passageEntity.passageUnit.asc(), passageEntity.passageNumber.asc())
-                // .orderBy(getOrderSpecifiers(pageable.getSort()).toArray(OrderSpecifier[]::new))
-                .fetch();
-    }
+	/**
+	 * content를 가져옴
+	 * 
+	 * @param pageable
+	 * @param passageType
+	 * @param passageYear
+	 * @param passageName
+	 * @param passageUnit
+	 * @param passageNumber
+	 * @return passageEntity.questionEntities.size()
+	 */
+	private List<PassageListDto> getPassageListDto(Pageable pageable, String passageYear, String passageName) {
+		return queryFactory
+				.select(new QPassageListDto(passageEntity.passageId, passageEntity.passageType,
+						passageEntity.passageName, passageEntity.passageUnit, passageEntity.passageNumber,
+						JPAExpressions.select(questionEntity.count()).from(questionEntity)
+								.where(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))))
+				.from(passageEntity).where(eqPassageYear(passageYear), containsPassageName(passageName))
+				.offset(pageable.getOffset()).limit(pageable.getPageSize())
+				.orderBy(passageEntity.passageName.asc(), passageEntity.passageUnit.asc(),
+						passageEntity.passageNumber.asc())
+				// .orderBy(getOrderSpecifiers(pageable.getSort()).toArray(OrderSpecifier[]::new))
+				.fetch();
+	}
 
-    /**
-     * 동적 정렬
-     * 
-     * @param sort
-     * @return
-     */
-    private List<OrderSpecifier<?>> getOrderSpecifiers(Sort sort) {
-        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
-        PathBuilder orderByExpression =
-                new PathBuilder<>(passageEntity.getType(), passageEntity.getMetadata());
+	/**
+	 * 동적 정렬
+	 * 
+	 * @param sort
+	 * @return
+	 */
+	private List<OrderSpecifier<?>> getOrderSpecifiers(Sort sort) {
+		List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+		PathBuilder orderByExpression = new PathBuilder<>(passageEntity.getType(), passageEntity.getMetadata());
 
-        sort.forEach(order -> {
-            Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-            String property = order.getProperty();
+		sort.forEach(order -> {
+			Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+			String property = order.getProperty();
 
-            orderSpecifiers.add(new OrderSpecifier<>(direction, orderByExpression.get(property)));
+			orderSpecifiers.add(new OrderSpecifier<>(direction, orderByExpression.get(property)));
 
-        });
+		});
 
-        return orderSpecifiers;
-    }
+		return orderSpecifiers;
+	}
 
+	/**
+	 * 교재 연도 비교
+	 * 
+	 * @param passageYear
+	 * @return
+	 */
+	private BooleanExpression eqPassageYear(String passageYear) {
+		return passageYear != null ? passageEntity.passageYear.eq(passageYear) : null;
+	}
 
-    /**
-     * 교재 연도 비교
-     * 
-     * @param passageYear
-     * @return
-     */
-    private BooleanExpression eqPassageYear(String passageYear) {
-        return passageYear != null ? passageEntity.passageYear.eq(passageYear) : null;
-    }
+	/**
+	 * 교재 이름 포함되어있는지 비교
+	 * 
+	 * @param passageName
+	 * @return
+	 */
+	private BooleanExpression containsPassageName(String passageName) {
+		return passageName != null ? passageEntity.passageName.contains(passageName) : null;
+	}
 
-    /**
-     * 교재 이름 포함되어있는지 비교
-     * 
-     * @param passageName
-     * @return
-     */
-    private BooleanExpression containsPassageName(String passageName) {
-        return passageName != null ? passageEntity.passageName.contains(passageName) : null;
-    }
+	/**
+	 * 교재 이름 같은 지 비교
+	 * 
+	 * @param passageName
+	 * @return
+	 */
+	private BooleanExpression eqPassageName(String passageName) {
+		return passageName != null ? passageEntity.passageName.eq(passageName) : null;
+	}
 
-    /**
-     * 교재 이름 같은 지 비교
-     * 
-     * @param passageName
-     * @return
-     */
-    private BooleanExpression eqPassageName(String passageName) {
-        return passageName != null ? passageEntity.passageName.eq(passageName) : null;
-    }
+	/**
+	 * 교재 종류 비교
+	 * 
+	 * @param passageType
+	 * @return
+	 */
+	private BooleanExpression eqPassageType(PassageType passageType) {
+		return passageType != null ? passageEntity.passageType.eq(passageType) : null;
+	}
 
-    /**
-     * 교재 종류 비교
-     * 
-     * @param passageType
-     * @return
-     */
-    private BooleanExpression eqPassageType(PassageType passageType) {
-        return passageType != null ? passageEntity.passageType.eq(passageType) : null;
-    }
+	/**
+	 * 강 비교
+	 * 
+	 * @param passageUnit
+	 * @return
+	 */
+	private BooleanExpression eqPassageUnit(String passageUnit) {
+		return passageUnit != null ? passageEntity.passageUnit.eq(passageUnit) : null;
+	}
 
-    /**
-     * 강 비교
-     * 
-     * @param passageUnit
-     * @return
-     */
-    private BooleanExpression eqPassageUnit(String passageUnit) {
-        return passageUnit != null ? passageEntity.passageUnit.eq(passageUnit) : null;
-    }
+	/**
+	 * 교재 종류별, 입력된 교재이름이 포함된 교재 이름 목록 검색
+	 */
+	@Override
+	public List<String> searchPassageNameList(PassageType passageType, String passageName) {
+		return queryFactory.select(passageEntity.passageName).distinct().from(passageEntity)
+				.where(passageEntity.passageType.eq(passageType), passageEntity.passageName.contains(passageName))
+				.fetch();
+	}
 
-    /**
-     * 교재 종류별, 입력된 교재이름이 포함된 교재 이름 목록 검색
-     */
-    @Override
-    public List<String> searchPassageNameList(PassageType passageType, String passageName) {
-        return queryFactory.select(passageEntity.passageName)
-                .distinct()
-                .from(passageEntity)
-                .where(passageEntity.passageType.eq(passageType),
-                        passageEntity.passageName.contains(passageName))
-                .fetch();
-    }
+	/**
+	 * 검색 조건에 따라 지문 (강) 조회
+	 * 
+	 * 페이징 처리
+	 * 
+	 * @param pageable
+	 * @param passageType
+	 * @param passageYear
+	 * @param passageName
+	 * @return
+	 */
+	@Override
+	public Page<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
+			PassageType passageType, String passageYear, String passageName) {
+		List<PassageNumberAndQuestionCountDto> passageUnits = getPassageUnit(pageable, passageType, passageYear,
+				passageName);
 
+		long count = queryFactory.select(passageEntity.passageUnit).from(passageEntity)
+				.where(eqPassageType(passageType), eqPassageYear(passageYear), eqPassageName(passageName))
+				.groupBy(passageEntity.passageUnit).fetch().size();
 
-    /**
-     * 검색 조건에 따라 지문 (강) 조회
-     * 
-     * 페이징 처리
-     * 
-     * @param pageable
-     * @param passageType
-     * @param passageYear
-     * @param passageName
-     * @return
-     */
-    @Override
-    public Page<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
-            PassageType passageType, String passageYear, String passageName) {
-        List<PassageNumberAndQuestionCountDto> passageUnits =
-                getPassageUnit(pageable, passageType, passageYear, passageName);
+		return PageableExecutionUtils.getPage(passageUnits, pageable, () -> count);
+	}
 
-        long count =
-                queryFactory.select(passageEntity.passageUnit)
-                        .from(passageEntity)
-                        .where(eqPassageType(passageType), eqPassageYear(passageYear),
-                                eqPassageName(passageName))
-                        .groupBy(passageEntity.passageUnit)
-                        .fetch().size();
+	/**
+	 * 검색 조건에 따라 지문 (강) 조회 - content
+	 * 
+	 * @param pageable
+	 * @param passageType
+	 * @param passageYear
+	 * @param passageName
+	 * @return
+	 */
+	private List<PassageNumberAndQuestionCountDto> getPassageUnit(Pageable pageable, PassageType passageType,
+			String passageYear, String passageName) {
+		List<String> passageUnitGroup = queryFactory.select(passageEntity.passageUnit).from(passageEntity)
+				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(passageYear),
+						passageEntity.passageName.eq(passageName))
+				.groupBy(passageEntity.passageUnit)
+				.orderBy(passageEntity.passageUnit.length().asc(), passageEntity.passageUnit.asc())
+				.limit(pageable.getPageSize()).offset(pageable.getOffset()).fetch();
 
-        return PageableExecutionUtils.getPage(passageUnits, pageable,
-                () -> count);
-    }
+		return queryFactory
+				.select(new QPassageNumberAndQuestionCountDto(passageEntity.passageName, passageEntity.passageUnit,
+						passageEntity.passageNumber, passageEntity.passageId.max(), questionEntity.count()))
+				.from(passageEntity).leftJoin(questionEntity)
+				.on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
+				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(passageYear),
+						passageEntity.passageName.eq(passageName), passageEntity.passageUnit.in(passageUnitGroup))
+				.groupBy(passageEntity.passageUnit, passageEntity.passageNumber).fetch();
+	}
 
-    /**
-     * 검색 조건에 따라 지문 (강) 조회 - content
-     * 
-     * @param pageable
-     * @param passageType
-     * @param passageYear
-     * @param passageName
-     * @return
-     */
-    private List<PassageNumberAndQuestionCountDto> getPassageUnit(Pageable pageable,
-            PassageType passageType,
-            String passageYear, String passageName) {
-        List<String> passageUnitGroup = queryFactory.select(passageEntity.passageUnit)
-                .from(passageEntity)
-                .where(passageEntity.passageType.eq(passageType),
-                        passageEntity.passageYear.eq(passageYear),
-                        passageEntity.passageName.eq(passageName))
-                .groupBy(passageEntity.passageUnit)
-                .orderBy(passageEntity.passageUnit.length().asc(), passageEntity.passageUnit.asc())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .fetch();
+	/**
+	 * 지문 유형과 연도에 해당되는 교재명 목록 조회
+	 */
+	@Override
+	public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
+		return queryFactory.select(passageEntity.passageName).distinct().from(passageEntity)
+				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(year)).fetch();
+	}
 
-
-        return queryFactory
-                .select(new QPassageNumberAndQuestionCountDto(
-                        passageEntity.passageUnit, passageEntity.passageNumber,
-                        passageEntity.passageId.max(),
-                        questionEntity.count()))
-                .from(passageEntity)
-                .leftJoin(questionEntity)
-                .on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
-                .where(
-                		passageEntity.passageType.eq(passageType),
-                        passageEntity.passageYear.eq(passageYear),
-                        passageEntity.passageName.eq(passageName),
-                        passageEntity.passageUnit.in(passageUnitGroup))
-                .groupBy(passageEntity.passageUnit, passageEntity.passageNumber)
-                .fetch();
-    }
-
-    /**
-     * 지문 유형과 연도에 해당되는 교재명 목록 조회
-     */
-    @Override
-    public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
-        return queryFactory.select(passageEntity.passageName)
-                .distinct()
-                .from(passageEntity)
-                .where(passageEntity.passageType.eq(passageType),
-                        passageEntity.passageYear.eq(year))
-                .fetch();
-    }
-
-    /**
-     * 같은 지문의 종류, 연도, 교재, 강, 번호에 대해선 유니크 해야 한다.
-     * 
-     * 만약 같은 지문이라면 지문 id와 content return후 지문 수정 로직 타도록 해야 함
-     */
-    @Override
-    public CheckExistPassageDto checkExistPassage(PassageType passageType, String passageYear,
-            String passageName, String passageUnit, String passageNumber) {
-        return queryFactory
-                .select(new QCheckExistPassageDto(passageEntity.passageId,
-                        passageEntity.passageContent))
-                .from(passageEntity)
-                .where(passageEntity.passageType.eq(passageType),
-                        passageEntity.passageYear.eq(passageYear),
-                        passageEntity.passageName.eq(passageName),
-                        passageEntity.passageUnit.eq(passageUnit),
-                        passageEntity.passageNumber.eq(passageNumber))
-                .fetchOne();
-    }
-
-
+	/**
+	 * 같은 지문의 종류, 연도, 교재, 강, 번호에 대해선 유니크 해야 한다.
+	 * 
+	 * 만약 같은 지문이라면 지문 id와 content return후 지문 수정 로직 타도록 해야 함
+	 */
+	@Override
+	public CheckExistPassageDto checkExistPassage(PassageType passageType, String passageYear, String passageName,
+			String passageUnit, String passageNumber) {
+		return queryFactory.select(new QCheckExistPassageDto(passageEntity.passageId, passageEntity.passageContent))
+				.from(passageEntity)
+				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(passageYear),
+						passageEntity.passageName.eq(passageName), passageEntity.passageUnit.eq(passageUnit),
+						passageEntity.passageNumber.eq(passageNumber))
+				.fetchOne();
+	}
 
 }

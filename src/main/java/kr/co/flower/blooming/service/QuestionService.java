@@ -45,242 +45,235 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class QuestionService {
-    private final QuestionRepository questionRepository;
-    private final PassageRepository passageRepository;
-    private final QuestionContentRepository questionContentRepository;
-    private final ChooseAnswerRepository chooseAnswerRepository;
+	private final QuestionRepository questionRepository;
+	private final PassageRepository passageRepository;
+	private final QuestionContentRepository questionContentRepository;
+	private final ChooseAnswerRepository chooseAnswerRepository;
 
-    /**
-     * 문제 저장
-     * 
-     * @param questionRegistDto
-     */
-    @Transactional
-    public void saveQuestion(QuestionRegistParam questionRegistParam) {
-        QuestionContentEntity questionContentEntity = new QuestionContentEntity();
-        questionContentEntity.setQuestionTitle(questionRegistParam.getQuestionTitle());
-        questionContentEntity.setQuestionContent(questionRegistParam.getQuestionContent());
-        questionContentRepository.save(questionContentEntity);
+	/**
+	 * 문제 저장
+	 * 
+	 * @param questionRegistDto
+	 */
+	@Transactional
+	public void saveQuestion(List<QuestionRegistParam> questionRegistParams) {
+		for (QuestionRegistParam questionRegistParam : questionRegistParams) {
 
-        PassageEntity passage = passageRepository.findById(questionRegistParam.getPassageId())
-                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+			QuestionContentEntity questionContentEntity = new QuestionContentEntity();
+			questionContentEntity.setQuestionTitle(questionRegistParam.getQuestionTitle());
+			questionContentEntity.setQuestionContent(questionRegistParam.getQuestionContent());
+			questionContentRepository.save(questionContentEntity);
 
-        UUID uuid = UUID.randomUUID();
+			PassageEntity passage = passageRepository.findById(questionRegistParam.getPassageId())
+					.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-        List<QuestionParam> questionParams = questionRegistParam.getQuestionParams();
-        questionParams.forEach(question -> {
-            QuestionEntity questionEntity = new QuestionEntity();
+			UUID uuid = UUID.randomUUID();
 
-            questionEntity.setQuestionCode(uuid.toString());
-            questionEntity.setQuestionType(question.getQuestionType());
-            questionEntity.setQuestionSubTitle(question.getQuestionSubTitle());
-            questionEntity.setPastYn(question.isPastYn());
-            questionEntity.setSubBox(question.getSubBox());
-            questionEntity.setPassageEntity(passage);
-            questionEntity.setQuestionContentEntity(questionContentEntity);
+			List<QuestionParam> questionParams = questionRegistParam.getQuestionParams();
+			questionParams.forEach(question -> {
+				QuestionEntity questionEntity = new QuestionEntity();
 
-            questionRepository.save(questionEntity);
+				questionEntity.setQuestionCode(uuid.toString());
+				questionEntity.setQuestionType(question.getQuestionType());
+				questionEntity.setQuestionSubTitle(question.getQuestionSubTitle());
+				questionEntity.setPastYn(question.isPastYn());
+				questionEntity.setSubBox(question.getSubBox());
+				questionEntity.setPassageEntity(passage);
+				questionEntity.setQuestionContentEntity(questionContentEntity);
 
-            // choose, answer bulk insert
-            chooseAnswerRepository.bulkSaveChoose(question.getChooseList(),
-                    questionEntity.getQuestionId());
-            chooseAnswerRepository.bulkSaveAnswer(question.getAnswerList(),
-                    questionEntity.getQuestionId());
-        });
-    }
+				questionRepository.save(questionEntity);
 
-    /**
-     * 문제 수정
-     * 
-     * @param questionRegistDto
-     */
-    @Transactional
-    public void updateQuestion(QuestionUpdateParam questionUpdateParam) {
-        // question code로 question entity 조회
-        List<QuestionEntity> questionEntityByCode =
-                questionRepository.findByQuestionCode(questionUpdateParam.getQuestionCode());
+				// choose, answer bulk insert
+				chooseAnswerRepository.bulkSaveChoose(question.getChooseList(), questionEntity.getQuestionId());
+				chooseAnswerRepository.bulkSaveAnswer(question.getAnswerList(), questionEntity.getQuestionId());
+			});
 
-        if (questionEntityByCode.isEmpty()) {
-            throw new FlowerException(FlowerError.ENTITY_NOT_FOUND);
-        }
+		}
+	}
 
-        if (questionEntityByCode.size() > 1) {
-            // 복합 지문
-            if (questionUpdateParam.getQuestionId() == 0) {
-                // 복합 지문 -> question title, question content 만 수정
-                updateQuestionContent(questionEntityByCode.get(0), questionUpdateParam);
-                return;
-            }
-        }
+	/**
+	 * 문제 수정
+	 * 
+	 * @param questionRegistDto
+	 */
+	@Transactional
+	public void updateQuestion(QuestionUpdateParam questionUpdateParam) {
+		// question code로 question entity 조회
+		List<QuestionEntity> questionEntityByCode = questionRepository
+				.findByQuestionCode(questionUpdateParam.getQuestionCode());
 
-        // 단일 지문 -> title, content, 문제 수정
-        QuestionEntity questionEntity =
-                questionRepository.findById(questionUpdateParam.getQuestionId())
-                        .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+		if (questionEntityByCode.isEmpty()) {
+			throw new FlowerException(FlowerError.ENTITY_NOT_FOUND);
+		}
 
-        updateQuestionContent(questionEntity, questionUpdateParam);
-        updateQuestionOne(questionEntity, questionUpdateParam);
-    }
+		if (questionEntityByCode.size() > 1) {
+			// 복합 지문
+			if (questionUpdateParam.getQuestionId() == 0) {
+				// 복합 지문 -> question title, question content 만 수정
+				updateQuestionContent(questionEntityByCode.get(0), questionUpdateParam);
+				return;
+			}
+		}
 
-    /**
-     * 문제의 title, content 수정
-     */
-    private void updateQuestionContent(QuestionEntity questionEntity,
-            QuestionUpdateParam questionUpdateParam) {
-        QuestionContentEntity questionContentEntity = questionEntity.getQuestionContentEntity();
-        questionContentEntity.setQuestionTitle(questionUpdateParam.getQuestionTitle());
-        questionContentEntity.setQuestionContent(questionUpdateParam.getQuestionContent());
-    }
+		// 단일 지문 -> title, content, 문제 수정
+		QuestionEntity questionEntity = questionRepository.findById(questionUpdateParam.getQuestionId())
+				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-    /**
-     * 단일 문제 수정
-     */
-    private void updateQuestionOne(QuestionEntity questionEntity,
-            QuestionUpdateParam questionUpdateParam) {
-        PassageEntity passage = passageRepository.findById(questionUpdateParam.getPassageId())
-                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+		updateQuestionContent(questionEntity, questionUpdateParam);
+		updateQuestionOne(questionEntity, questionUpdateParam);
+	}
 
-        questionEntity.setQuestionType(questionUpdateParam.getQuestionType());
-        questionEntity.setQuestionSubTitle(questionUpdateParam.getQuestionSubTitle());
-        questionEntity.setPastYn(questionUpdateParam.isPastYn());
-        questionEntity.setSubBox(questionUpdateParam.getSubBox());
-        questionEntity.setPassageEntity(passage);
+	/**
+	 * 문제의 title, content 수정
+	 */
+	private void updateQuestionContent(QuestionEntity questionEntity, QuestionUpdateParam questionUpdateParam) {
+		QuestionContentEntity questionContentEntity = questionEntity.getQuestionContentEntity();
+		questionContentEntity.setQuestionTitle(questionUpdateParam.getQuestionTitle());
+		questionContentEntity.setQuestionContent(questionUpdateParam.getQuestionContent());
+	}
 
-        // choose, answer bulk update
-        chooseAnswerRepository.bulkUpdateChoose(questionUpdateParam.getChooseList(),
-                questionEntity.getQuestionId());
-        chooseAnswerRepository.bulkUpdateAnswer(questionUpdateParam.getAnswerList(),
-                questionEntity.getQuestionId());
-    }
+	/**
+	 * 단일 문제 수정
+	 */
+	private void updateQuestionOne(QuestionEntity questionEntity, QuestionUpdateParam questionUpdateParam) {
+		PassageEntity passage = passageRepository.findById(questionUpdateParam.getPassageId())
+				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-    /**
-     * 문제 id로 삭제
-     * 
-     * @param questionId
-     */
-    @Transactional
-    public void deleteQuestionById(long questionId) {
-        questionRepository.findById(questionId)
-                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+		questionEntity.setQuestionType(questionUpdateParam.getQuestionType());
+		questionEntity.setQuestionSubTitle(questionUpdateParam.getQuestionSubTitle());
+		questionEntity.setPastYn(questionUpdateParam.isPastYn());
+		questionEntity.setSubBox(questionUpdateParam.getSubBox());
+		questionEntity.setPassageEntity(passage);
 
-        chooseAnswerRepository.bulkDeleteChoose(questionId);
-        chooseAnswerRepository.bulkDeleteAnswer(questionId);
-        questionRepository.deleteById(questionId);
-    }
+		// choose, answer bulk update
+		chooseAnswerRepository.bulkUpdateChoose(questionUpdateParam.getChooseList(), questionEntity.getQuestionId());
+		chooseAnswerRepository.bulkUpdateAnswer(questionUpdateParam.getAnswerList(), questionEntity.getQuestionId());
+	}
 
-    /**
-     * 문제 코드로 삭제
-     * 
-     * @param questionId
-     */
-    @Transactional
-    public void deleteQuestionByCode(String questionCode) {
-        questionRepository.findByQuestionCode(questionCode).forEach(question -> {
-            deleteQuestionById(question.getQuestionId());
-        });
-    }
+	/**
+	 * 문제 id로 삭제
+	 * 
+	 * @param questionId
+	 */
+	@Transactional
+	public void deleteQuestionById(long questionId) {
+		questionRepository.findById(questionId).orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-    /**
-     * 검색 조건에 따라 지문 번호 - 지문 강에 따라 그루핑 하여 조회
-     * 
-     * 페이징 처리
-     * 
-     * @param pabeable
-     * @param passageType
-     * @param passageYear
-     * @param passageName
-     */
-    public PassageGroupByUnitPageDto searchPassageNumbers(Pageable pageable,
-            PassageType passageType,
-            String passageYear, String passageName) {
-        PassageGroupByUnitPageDto groupByUnitPageDto = new PassageGroupByUnitPageDto();
-        List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
+		chooseAnswerRepository.bulkDeleteChoose(questionId);
+		chooseAnswerRepository.bulkDeleteAnswer(questionId);
+		questionRepository.deleteById(questionId);
+	}
 
-        // 페이징된 passage number, question count
-        Page<PassageNumberAndQuestionCountDto> searchPage = passageRepository
-                .searchPassageUnitGroupByUnit(pageable, passageType, passageYear, passageName);
-        List<PassageNumberAndQuestionCountDto> content = searchPage.getContent();
+	/**
+	 * 문제 코드로 삭제
+	 * 
+	 * @param questionId
+	 */
+	@Transactional
+	public void deleteQuestionByCode(String questionCode) {
+		questionRepository.findByQuestionCode(questionCode).forEach(question -> {
+			deleteQuestionById(question.getQuestionId());
+		});
+	}
 
-        // passage unit으로 grouping
-        Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
-                .collect(Collectors.groupingBy(PassageNumberAndQuestionCountDto::getPassageUnit));
+	/**
+	 * 검색 조건에 따라 지문 번호 - 지문 강에 따라 그루핑 하여 조회
+	 * 
+	 * 페이징 처리
+	 * 
+	 * @param pabeable
+	 * @param passageType
+	 * @param passageYear
+	 * @param passageName
+	 */
+	public PassageGroupByUnitPageDto searchPassageNumbers(Pageable pageable, PassageType passageType,
+			String passageYear, String passageName) {
+		PassageGroupByUnitPageDto groupByUnitPageDto = new PassageGroupByUnitPageDto();
+		List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
 
-        for (Entry<String, List<PassageNumberAndQuestionCountDto>> entry : groupByUnit.entrySet()) {
-            byUnitDtos.add(
-                    PassageGroupByUnitDto.builder().passageUnit(entry.getKey())
-                            .passageInfo(entry.getValue()).build());
-        }
+		// 페이징된 passage number, question count
+		Page<PassageNumberAndQuestionCountDto> searchPage = passageRepository.searchPassageUnitGroupByUnit(pageable,
+				passageType, passageYear, passageName);
+		List<PassageNumberAndQuestionCountDto> content = searchPage.getContent();
 
-        groupByUnitPageDto.setList(byUnitDtos);
-        groupByUnitPageDto.setPageSize(searchPage.getTotalPages());
+		// passage unit으로 grouping
+		Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
+				.collect(Collectors.groupingBy(PassageNumberAndQuestionCountDto::getPassageUnit));
 
-        return groupByUnitPageDto;
-    }
+		for (Entry<String, List<PassageNumberAndQuestionCountDto>> entry : groupByUnit.entrySet()) {
+			byUnitDtos.add(
+					PassageGroupByUnitDto.builder().passageUnit(entry.getKey()).passageInfo(entry.getValue()).build());
+		}
 
-    /**
-     * 지문 유형과 연도에 해당되는 교재명 목록 조회
-     * 
-     * @param passageType
-     * @param year
-     * @return
-     */
-    public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
-        return passageRepository.searchPassageNameByTypeAndYear(passageType, year);
-    }
+		groupByUnitPageDto.setList(byUnitDtos);
+		groupByUnitPageDto.setPageSize(searchPage.getTotalPages());
 
-    /**
-     * 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환
-     * 
-     * @param questionEntities
-     * @return
-     */
-    public List<SearchQuestionDtos> convertQuestionDtos(List<QuestionEntity> questionEntities) {
-        List<SearchQuestionDtos> questions = new ArrayList<>();
+		return groupByUnitPageDto;
+	}
 
-        Map<String, List<QuestionEntity>> groupByCode = questionEntities.stream()
-                .collect(Collectors.groupingBy(QuestionEntity::getQuestionCode));
+	/**
+	 * 지문 유형과 연도에 해당되는 교재명 목록 조회
+	 * 
+	 * @param passageType
+	 * @param year
+	 * @return
+	 */
+	public List<String> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
+		return passageRepository.searchPassageNameByTypeAndYear(passageType, year);
+	}
 
-        for (Entry<String, List<QuestionEntity>> entry : groupByCode.entrySet()) {
-            String questionCode = entry.getKey();
-            List<QuestionEntity> questionByCode = entry.getValue();
+	/**
+	 * 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환
+	 * 
+	 * @param questionEntities
+	 * @return
+	 */
+	public List<SearchQuestionDtos> convertQuestionDtos(List<QuestionEntity> questionEntities) {
+		List<SearchQuestionDtos> questions = new ArrayList<>();
 
-            SearchQuestionDtos searchQuestionDtos = new SearchQuestionDtos();
-            searchQuestionDtos.setQuestionCode(questionCode);
-            searchQuestionDtos.setQuestionTitle(
-                    questionByCode.get(0).getQuestionContentEntity().getQuestionTitle());
-            searchQuestionDtos.setQuestionContent(
-                    questionByCode.get(0).getQuestionContentEntity().getQuestionContent());
+		Map<String, List<QuestionEntity>> groupByCode = questionEntities.stream()
+				.collect(Collectors.groupingBy(QuestionEntity::getQuestionCode));
 
-            List<SearchQuestionDto> searchQuestionDto = new ArrayList<>();
-            for (QuestionEntity question : questionByCode) {
-                SearchQuestionDto questionDto = new SearchQuestionDto();
-                questionDto.setQuestionId(question.getQuestionId());
-                questionDto.setQuestionType(question.getQuestionType());
-                questionDto.setQuestionSubTitle(question.getQuestionSubTitle());
-                questionDto.setSubBox(question.getSubBox());
-                questionDto.setPastYn(question.isPastYn());
-                questionDto.setChoose(question.getChooseEntities().stream().map(choose -> {
-                    ChooseDto chooseDto = new ChooseDto();
-                    chooseDto.setSeq(choose.getChooseSeq());
-                    chooseDto.setContent(choose.getChooseContent());
+		for (Entry<String, List<QuestionEntity>> entry : groupByCode.entrySet()) {
+			String questionCode = entry.getKey();
+			List<QuestionEntity> questionByCode = entry.getValue();
 
-                    return chooseDto;
-                }).collect(Collectors.toList()));
-                questionDto.setAnswer(question.getAnswerEntities().stream().map(answer -> {
-                    AnswerDto answerDto = new AnswerDto();
-                    answerDto.setContent(answer.getAnswerContent());
+			SearchQuestionDtos searchQuestionDtos = new SearchQuestionDtos();
+			searchQuestionDtos.setQuestionCode(questionCode);
+			searchQuestionDtos.setQuestionTitle(questionByCode.get(0).getQuestionContentEntity().getQuestionTitle());
+			searchQuestionDtos
+					.setQuestionContent(questionByCode.get(0).getQuestionContentEntity().getQuestionContent());
 
-                    return answerDto;
-                }).collect(Collectors.toList()));
+			List<SearchQuestionDto> searchQuestionDto = new ArrayList<>();
+			for (QuestionEntity question : questionByCode) {
+				SearchQuestionDto questionDto = new SearchQuestionDto();
+				questionDto.setQuestionId(question.getQuestionId());
+				questionDto.setQuestionType(question.getQuestionType());
+				questionDto.setQuestionSubTitle(question.getQuestionSubTitle());
+				questionDto.setSubBox(question.getSubBox());
+				questionDto.setPastYn(question.isPastYn());
+				questionDto.setChoose(question.getChooseEntities().stream().map(choose -> {
+					ChooseDto chooseDto = new ChooseDto();
+					chooseDto.setSeq(choose.getChooseSeq());
+					chooseDto.setContent(choose.getChooseContent());
 
-                searchQuestionDto.add(questionDto);
-            }
+					return chooseDto;
+				}).collect(Collectors.toList()));
+				questionDto.setAnswer(question.getAnswerEntities().stream().map(answer -> {
+					AnswerDto answerDto = new AnswerDto();
+					answerDto.setContent(answer.getAnswerContent());
 
-            searchQuestionDtos.setQuestion(searchQuestionDto);
-            questions.add(searchQuestionDtos);
-        }
+					return answerDto;
+				}).collect(Collectors.toList()));
 
-        return questions;
-    }
+				searchQuestionDto.add(questionDto);
+			}
+
+			searchQuestionDtos.setQuestion(searchQuestionDto);
+			questions.add(searchQuestionDtos);
+		}
+
+		return questions;
+	}
 
 }
