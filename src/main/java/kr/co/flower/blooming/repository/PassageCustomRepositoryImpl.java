@@ -167,16 +167,10 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 	 * @return
 	 */
 	@Override
-	public Page<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
+	public List<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
 			PassageType passageType, String passageYear, String passageName) {
-		List<PassageNumberAndQuestionCountDto> passageUnits = getPassageUnit(pageable, passageType, passageYear,
+		return getPassageUnit(pageable, passageType, passageYear,
 				passageName);
-
-		long count = queryFactory.select(passageEntity.passageUnit).from(passageEntity)
-				.where(eqPassageType(passageType), eqPassageYear(passageYear), eqPassageName(passageName))
-				.groupBy(passageEntity.passageUnit).fetch().size();
-
-		return PageableExecutionUtils.getPage(passageUnits, pageable, () -> count);
 	}
 
 	/**

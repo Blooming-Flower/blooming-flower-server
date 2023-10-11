@@ -45,7 +45,7 @@ public interface PassageCustomRepository {
      * @param passageName
      * @return
      */
-    Page<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
+    List<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
             PassageType passageType,
             String passageYear,
             String passageName);

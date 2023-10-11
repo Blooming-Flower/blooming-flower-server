@@ -191,10 +191,8 @@ public class QuestionService {
 		PassageGroupByUnitPageDto groupByUnitPageDto = new PassageGroupByUnitPageDto();
 		List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
 
-		// 페이징된 passage number, question count
-		Page<PassageNumberAndQuestionCountDto> searchPage = passageRepository.searchPassageUnitGroupByUnit(pageable,
+		List<PassageNumberAndQuestionCountDto> content = passageRepository.searchPassageUnitGroupByUnit(pageable,
 				passageType, passageYear, passageName);
-		List<PassageNumberAndQuestionCountDto> content = searchPage.getContent();
 
 		// passage unit으로 grouping
 		Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
@@ -206,7 +204,10 @@ public class QuestionService {
 		}
 
 		groupByUnitPageDto.setList(byUnitDtos);
-		groupByUnitPageDto.setPageSize(searchPage.getTotalPages());
+		
+		int unitNum = groupByUnit.keySet().size();
+		int pageSize= unitNum / pageable.getPageSize() + 1;
+		groupByUnitPageDto.setPageSize(pageSize);
 
 		return groupByUnitPageDto;
 	}
