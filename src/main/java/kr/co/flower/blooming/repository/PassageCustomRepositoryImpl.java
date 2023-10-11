@@ -198,8 +198,7 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 				.from(passageEntity).leftJoin(questionEntity)
 				.on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
 				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(passageYear),
-						passageEntity.passageName.eq(passageName),  JPAExpressions.selectFrom(passageEntity)
-						.where(passageEntity.passageUnit.in(passageUnitGroup)).exists())
+						passageEntity.passageName.eq(passageName),  passageEntity.passageUnit.in(passageUnitGroup))
 				.groupBy(passageEntity.passageUnit, passageEntity.passageNumber).fetch();
 	}
 

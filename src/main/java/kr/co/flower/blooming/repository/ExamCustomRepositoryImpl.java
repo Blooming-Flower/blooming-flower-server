@@ -144,8 +144,7 @@ public class ExamCustomRepositoryImpl implements ExamCustomRepository {
                 .where(passageEntity.passageType.eq(passageType), 
                         passageEntity.passageYear.eq(passageYear),
                         passageEntity.passageName.eq(passageName),  
-                        JPAExpressions.selectFrom(passageEntity)
-                            .where(passageEntity.passageUnit.in(passageUnitGroup)).exists())
+                        passageEntity.passageUnit.in(passageUnitGroup))
                 .groupBy(passageEntity.passageUnit, passageEntity.passageNumber)
                 .fetch();
     }
