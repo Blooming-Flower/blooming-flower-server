@@ -61,16 +61,11 @@ public class ExamService {
 		for (long passageId : passageIds) {
 			List<Long> questionIds = questionRepository.findByPassageIdAndTypes(passageId,
 					questionTypeParam.getQuestionTypes());
-			PassageEntity passageEntity = passageRepository.findById(passageId)
-					.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
 			questionIdAndCountDtos.add(QuestionIdAndCountDto.builder()
 					.passageId(passageId)
 					.questionIds(questionIds)
 					.count(questionIds.size())
-					.passageName(passageEntity.getPassageName())
-					.passageUnit(passageEntity.getPassageUnit())
-					.passageYear(passageEntity.getPassageYear())
 					.build());
 		}
 

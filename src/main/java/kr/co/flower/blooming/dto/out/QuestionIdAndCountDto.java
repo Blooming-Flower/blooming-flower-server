@@ -22,7 +22,4 @@ public class QuestionIdAndCountDto {
 	private long passageId;
 	private List<Long> questionIds = new ArrayList<>();
 	private long count;
-	private String passageYear; // 연도
-	private String passageName;// 교재명
-	private String passageUnit;// 강
 }
