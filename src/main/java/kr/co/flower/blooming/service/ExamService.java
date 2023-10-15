@@ -22,11 +22,13 @@ import kr.co.flower.blooming.dto.out.QuestionIdAndCountDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos;
 import kr.co.flower.blooming.entity.ExamEntity;
 import kr.co.flower.blooming.entity.ExamQuestionEntity;
+import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.entity.QuestionEntity;
 import kr.co.flower.blooming.exception.FlowerError;
 import kr.co.flower.blooming.exception.FlowerException;
 import kr.co.flower.blooming.repository.ExamRepository;
+import kr.co.flower.blooming.repository.PassageRepository;
 import kr.co.flower.blooming.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,185 +44,182 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ExamService {
-    private final QuestionRepository questionRepository;
-    private final ExamRepository examRepository;
-    private final QuestionService questionService;
+	private final QuestionRepository questionRepository;
+	private final ExamRepository examRepository;
+	private final QuestionService questionService;
+	private final PassageRepository passageRepository;
 
-    /**
-     * 지문id와 유형에 따라 문제수와 문제id return
-     * 
-     * @param questionTypeParam
-     */
-    public List<QuestionIdAndCountDto> getQuestionIdAndCount(QuestionTypeParam questionTypeParam) {
-        List<QuestionIdAndCountDto> questionIdAndCountDtos = new ArrayList<>();
+	/**
+	 * 지문id와 유형에 따라 문제수와 문제id return
+	 * 
+	 * @param questionTypeParam
+	 */
+	public List<QuestionIdAndCountDto> getQuestionIdAndCount(QuestionTypeParam questionTypeParam) {
+		List<QuestionIdAndCountDto> questionIdAndCountDtos = new ArrayList<>();
 
-        List<Long> passageIds = questionTypeParam.getPassageIds();
-        for (long passageId : passageIds) {
-            List<Long> questionIds = questionRepository.findByPassageIdAndTypes(passageId,
-                    questionTypeParam.getQuestionTypes());
+		List<Long> passageIds = questionTypeParam.getPassageIds();
+		for (long passageId : passageIds) {
+			List<Long> questionIds = questionRepository.findByPassageIdAndTypes(passageId,
+					questionTypeParam.getQuestionTypes());
+			PassageEntity passageEntity = passageRepository.findById(passageId)
+					.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-            questionIdAndCountDtos.add(QuestionIdAndCountDto.builder()
-                    .passageId(passageId)
-                    .questionIds(questionIds)
-                    .count(questionIds.size())
-                    .build());
-        }
+			questionIdAndCountDtos.add(QuestionIdAndCountDto.builder()
+					.passageId(passageId)
+					.questionIds(questionIds)
+					.count(questionIds.size())
+					.passageName(passageEntity.getPassageName())
+					.passageUnit(passageEntity.getPassageUnit())
+					.passageYear(passageEntity.getPassageYear())
+					.build());
+		}
 
-        return questionIdAndCountDtos;
-    }
+		return questionIdAndCountDtos;
+	}
 
-    /**
-     * 시험지 제작
-     * 
-     * @param examParam
-     */
-    @Transactional
-    public void makeExam(MakeExamParam examParam) {
-        ExamEntity examEntity = new ExamEntity();
-        examEntity.setExamTitle(examParam.getTitle());
-        examEntity.setExamSubTitle(examParam.getSubTitle());
-        examEntity.setExamLeftFooter(examParam.getLeftFooter());
-        examEntity.setExamRightFooter(examParam.getRightFooter());
-        examEntity.setExamFormat(examParam.getExamFormat());
+	/**
+	 * 시험지 제작
+	 * 
+	 * @param examParam
+	 */
+	@Transactional
+	public void makeExam(MakeExamParam examParam) {
+		ExamEntity examEntity = new ExamEntity();
+		examEntity.setExamTitle(examParam.getTitle());
+		examEntity.setExamSubTitle(examParam.getSubTitle());
+		examEntity.setExamLeftFooter(examParam.getLeftFooter());
+		examEntity.setExamRightFooter(examParam.getRightFooter());
+		examEntity.setExamFormat(examParam.getExamFormat());
 
+		List<ExamQuestionEntity> examQuestionEntities = examParam.getQuestionParams().stream().map(examQuestion -> {
+			long questionId = examQuestion.getQuestionId();
+			QuestionEntity questionEntity = questionRepository.findById(questionId)
+					.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
+			ExamQuestionEntity examQuestionEntity = new ExamQuestionEntity();
+			examQuestionEntity.setExamEntity(examEntity);
+			examQuestionEntity.setQuestionEntity(questionEntity);
+			examQuestionEntity.setGroupSeq(examQuestion.getGroupSeq());
+			examQuestionEntity.setGroupName(examQuestion.getGroupName());
 
-        List<ExamQuestionEntity> examQuestionEntities =
-                examParam.getQuestionParams().stream().map(examQuestion -> {
-                    long questionId = examQuestion.getQuestionId();
-                    QuestionEntity questionEntity = questionRepository.findById(questionId)
-                            .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+			return examQuestionEntity;
+		}).collect(Collectors.toList());
 
-                    ExamQuestionEntity examQuestionEntity = new ExamQuestionEntity();
-                    examQuestionEntity.setExamEntity(examEntity);
-                    examQuestionEntity.setQuestionEntity(questionEntity);
-                    examQuestionEntity.setGroupSeq(examQuestion.getGroupSeq());
-                    examQuestionEntity.setGroupName(examQuestion.getGroupName());
+		examEntity.setExamQuestionEntities(examQuestionEntities);
 
-                    return examQuestionEntity;
-                }).collect(Collectors.toList());
+		examRepository.save(examEntity);
+	}
 
-        examEntity.setExamQuestionEntities(examQuestionEntities);
+	/**
+	 * 동적 검색 쿼리, filter, order에 따라 paging
+	 * 
+	 * @param pageable
+	 * @param examTitle
+	 * @return
+	 */
+	public Page<ExamListDto> findExamList(Pageable pageable, String examTitle) {
+		return examRepository.findExamList(pageable, examTitle);
+	}
 
-        examRepository.save(examEntity);
-    }
+	/**
+	 * 시험지 삭제
+	 * 
+	 * @param examId
+	 */
+	@Transactional
+	public void deleteExam(long examId) {
+		examRepository.deleteById(examId);
+	}
 
-    /**
-     * 동적 검색 쿼리, filter, order에 따라 paging
-     * 
-     * @param pageable
-     * @param examTitle
-     * @return
-     */
-    public Page<ExamListDto> findExamList(Pageable pageable, String examTitle) {
-        return examRepository.findExamList(pageable, examTitle);
-    }
+	/**
+	 * 시험지 문제들 불러오기
+	 * 
+	 * @param examId
+	 */
+	public ExamPagesDto loadExam(long examId) {
+		ExamEntity examEntity = examRepository.findById(examId)
+				.orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
 
-    /**
-     * 시험지 삭제
-     * 
-     * @param examId
-     */
-    @Transactional
-    public void deleteExam(long examId) {
-        examRepository.deleteById(examId);
-    }
+		List<ExamQuestionEntity> examQuestionEntities = examEntity.getExamQuestionEntities();
 
-    /**
-     * 시험지 문제들 불러오기
-     * 
-     * @param examId
-     */
-    public ExamPagesDto loadExam(long examId) {
-        ExamEntity examEntity = examRepository.findById(examId)
-                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+		// 문제들 섞는 로직
+		List<ExamPageGroupDto> examQuestions = new ArrayList<>();
+		Map<Integer, List<ExamQuestionEntity>> questionGroup = examQuestionEntities.stream()
+				.collect(Collectors.groupingBy(ExamQuestionEntity::getGroupSeq));
 
-        List<ExamQuestionEntity> examQuestionEntities = examEntity.getExamQuestionEntities();
+		List<Integer> groupSeq = questionGroup.keySet().stream().sorted().collect(Collectors.toList());
 
+		for (int seq : groupSeq) {
+			// 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환
+			List<SearchQuestionDtos> questions = questionService.convertQuestionDtos(questionGroup.get(seq).stream()
+					.map(ExamQuestionEntity::getQuestionEntity).collect(Collectors.toList()));
 
-        // 문제들 섞는 로직
-        List<ExamPageGroupDto> examQuestions = new ArrayList<>();
-        Map<Integer, List<ExamQuestionEntity>> questionGroup = examQuestionEntities.stream()
-                .collect(Collectors.groupingBy(ExamQuestionEntity::getGroupSeq));
+			// shuffle
+			Collections.shuffle(questions);
 
-        List<Integer> groupSeq =
-                questionGroup.keySet().stream().sorted().collect(Collectors.toList());
+			ExamPageGroupDto examPageGroupDto = new ExamPageGroupDto();
+			examPageGroupDto.setGroupName(questionGroup.get(seq).get(0).getGroupName());
+			examPageGroupDto.setQuestions(questions);
+			examQuestions.add(examPageGroupDto);
+		}
 
-        for (int seq : groupSeq) {
-            // 문제 code 별, 문제(발문, 지문, 선지, 답) dto 로 변환
-            List<SearchQuestionDtos> questions = questionService.convertQuestionDtos(questionGroup
-                    .get(seq).stream()
-                    .map(ExamQuestionEntity::getQuestionEntity).collect(Collectors.toList()));
+		ExamPagesDto examPagesDto = new ExamPagesDto();
+		examPagesDto.setTitle(examEntity.getExamTitle());
+		examPagesDto.setSubTitle(examEntity.getExamSubTitle());
+		examPagesDto.setLeftFooter(examEntity.getExamLeftFooter());
+		examPagesDto.setRightFooter(examEntity.getExamRightFooter());
+		examPagesDto.setExamFormat(examEntity.getExamFormat());
+		examPagesDto.setExamQuestions(examQuestions);
 
-            // shuffle
-            Collections.shuffle(questions);
+		return examPagesDto;
+	}
 
-            ExamPageGroupDto examPageGroupDto = new ExamPageGroupDto();
-            examPageGroupDto.setGroupName(questionGroup.get(seq).get(0).getGroupName());
-            examPageGroupDto.setQuestions(questions);
-            examQuestions.add(examPageGroupDto);
-        }
+	/**
+	 * 검색 조건에 따라 지문 번호 - 지문 강에 따라 그루핑 하여 조회
+	 * 
+	 * 출제된 문제가 있는 것들 filtering
+	 * 
+	 * 페이징 처리
+	 * 
+	 * @param pabeable
+	 * @param passageType
+	 * @param passageYear
+	 * @param passageName
+	 */
+	public PassageGroupByUnitPageDto searchPassageNumbersHavingQuestion(Pageable pageable, PassageType passageType,
+			String passageYear, String passageName) {
+		PassageGroupByUnitPageDto groupByUnitPageDto = new PassageGroupByUnitPageDto();
+		List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
 
-        ExamPagesDto examPagesDto = new ExamPagesDto();
-        examPagesDto.setTitle(examEntity.getExamTitle());
-        examPagesDto.setSubTitle(examEntity.getExamSubTitle());
-        examPagesDto.setLeftFooter(examEntity.getExamLeftFooter());
-        examPagesDto.setRightFooter(examEntity.getExamRightFooter());
-        examPagesDto.setExamFormat(examEntity.getExamFormat());
-        examPagesDto.setExamQuestions(examQuestions);
+		List<PassageNumberAndQuestionCountDto> content = examRepository.searchPassageNumbersHavingQuestion(pageable,
+				passageType, passageYear, passageName);
 
-        return examPagesDto;
-    }
+		// passage unit으로 grouping
+		Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
+				.collect(Collectors.groupingBy(PassageNumberAndQuestionCountDto::getPassageUnit));
 
-    /**
-     * 검색 조건에 따라 지문 번호 - 지문 강에 따라 그루핑 하여 조회
-     * 
-     * 출제된 문제가 있는 것들 filtering
-     * 
-     * 페이징 처리
-     * 
-     * @param pabeable
-     * @param passageType
-     * @param passageYear
-     * @param passageName
-     */
-    public PassageGroupByUnitPageDto searchPassageNumbersHavingQuestion(Pageable pageable,
-            PassageType passageType,
-            String passageYear, String passageName) {
-        PassageGroupByUnitPageDto groupByUnitPageDto = new PassageGroupByUnitPageDto();
-        List<PassageGroupByUnitDto> byUnitDtos = new ArrayList<>();
+		for (Entry<String, List<PassageNumberAndQuestionCountDto>> entry : groupByUnit.entrySet()) {
+			byUnitDtos.add(
+					PassageGroupByUnitDto.builder().passageUnit(entry.getKey()).passageInfo(entry.getValue()).build());
+		}
 
-        List<PassageNumberAndQuestionCountDto> content =
-                examRepository.searchPassageNumbersHavingQuestion(pageable,
-                        passageType, passageYear, passageName);
+		groupByUnitPageDto.setList(byUnitDtos);
 
-        // passage unit으로 grouping
-        Map<String, List<PassageNumberAndQuestionCountDto>> groupByUnit = content.stream()
-                .collect(Collectors.groupingBy(PassageNumberAndQuestionCountDto::getPassageUnit));
+		int unitNum = groupByUnit.keySet().size();
+		int pageSize = unitNum / pageable.getPageSize() + 1;
+		groupByUnitPageDto.setPageSize(pageSize);
 
-        for (Entry<String, List<PassageNumberAndQuestionCountDto>> entry : groupByUnit.entrySet()) {
-            byUnitDtos.add(
-                    PassageGroupByUnitDto.builder().passageUnit(entry.getKey())
-                            .passageInfo(entry.getValue()).build());
-        }
+		return groupByUnitPageDto;
+	}
 
-        groupByUnitPageDto.setList(byUnitDtos);
-
-        int unitNum = groupByUnit.keySet().size();
-        int pageSize = unitNum / pageable.getPageSize() + 1;
-        groupByUnitPageDto.setPageSize(pageSize);
-
-        return groupByUnitPageDto;
-    }
-
-    /**
-     * question이 하나라도 있는 passage type, year인 지문 명 찾기
-     * 
-     * @param passageType
-     * @param year
-     * @return
-     */
-    public List<String> searchPassageNameHavingQuestion(PassageType passageType, String year) {
-        return examRepository.searchPassageNameHavingQuestion(passageType, year);
-    }
+	/**
+	 * question이 하나라도 있는 passage type, year인 지문 명 찾기
+	 * 
+	 * @param passageType
+	 * @param year
+	 * @return
+	 */
+	public List<String> searchPassageNameHavingQuestion(PassageType passageType, String year) {
+		return examRepository.searchPassageNameHavingQuestion(passageType, year);
+	}
 }
