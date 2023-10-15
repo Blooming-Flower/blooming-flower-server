@@ -10,10 +10,16 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.flower.blooming.dto.out.ExamListDto;
+import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.dto.out.QExamListDto;
+import kr.co.flower.blooming.dto.out.QPassageNumberAndQuestionCountDto;
+import kr.co.flower.blooming.entity.PassageType;
+import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
 import static kr.co.flower.blooming.entity.QExamEntity.examEntity;
+import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -87,6 +93,60 @@ public class ExamCustomRepositoryImpl implements ExamCustomRepository {
      */
     private BooleanExpression containsExamTitle(String examTitle) {
         return examTitle != null ? examEntity.examTitle.eq(examTitle) : null;
+    }
+    
+    
+    /**
+     * question이 하나라도 있는 passage type, year인 지문 명 찾기 
+     */
+    @Override
+    public List<String> searchPassageNameHavingQuestion(PassageType passageType, String year) {
+        return queryFactory.select(passageEntity.passageName)
+                .distinct()
+                .from(passageEntity)
+                .innerJoin(questionEntity)
+                .on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
+                .where(passageEntity.passageType.eq(passageType), 
+                        passageEntity.passageYear.eq(year))
+                .fetch();
+    }
+    
+    /**
+     * 검색 조건에 따라 question이 하나라도 있는 지문 (강) 조회
+     * 
+     * @param pageable
+     * @param passageType
+     * @param passageYear
+     * @param passageName
+     * @return
+     */
+    @Override
+    public List<PassageNumberAndQuestionCountDto> searchPassageNumbersHavingQuestion(Pageable pageable, PassageType passageType,
+            String passageYear, String passageName) {
+        List<String> passageUnitGroup = queryFactory.select(passageEntity.passageUnit).from(passageEntity)
+                .innerJoin(questionEntity)
+                .on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
+                .where( passageEntity.passageType.eq(passageType), 
+                        passageEntity.passageYear.eq(passageYear),
+                        passageEntity.passageName.eq(passageName))
+                .groupBy(passageEntity.passageUnit)
+                .orderBy(passageEntity.passageUnit.length().asc(), 
+                        passageEntity.passageUnit.asc())
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .fetch();
+
+        return queryFactory 
+                .select(new QPassageNumberAndQuestionCountDto(passageEntity.passageName, passageEntity.passageUnit,
+                        passageEntity.passageNumber, passageEntity.passageId.max(), questionEntity.count()))
+                .from(passageEntity).innerJoin(questionEntity)
+                .on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
+                .where(passageEntity.passageType.eq(passageType), 
+                        passageEntity.passageYear.eq(passageYear),
+                        passageEntity.passageName.eq(passageName),  
+                        passageEntity.passageUnit.in(passageUnitGroup))
+                .groupBy(passageEntity.passageUnit, passageEntity.passageNumber)
+                .fetch();
     }
 
 }

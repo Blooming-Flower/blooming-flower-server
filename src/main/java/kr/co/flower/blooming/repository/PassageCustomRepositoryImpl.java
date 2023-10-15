@@ -4,6 +4,7 @@ import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
 import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.Where;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -167,16 +168,10 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 	 * @return
 	 */
 	@Override
-	public Page<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
+	public List<PassageNumberAndQuestionCountDto> searchPassageUnitGroupByUnit(Pageable pageable,
 			PassageType passageType, String passageYear, String passageName) {
-		List<PassageNumberAndQuestionCountDto> passageUnits = getPassageUnit(pageable, passageType, passageYear,
+		return getPassageUnit(pageable, passageType, passageYear,
 				passageName);
-
-		long count = queryFactory.select(passageEntity.passageUnit).from(passageEntity)
-				.where(eqPassageType(passageType), eqPassageYear(passageYear), eqPassageName(passageName))
-				.groupBy(passageEntity.passageUnit).fetch().size();
-
-		return PageableExecutionUtils.getPage(passageUnits, pageable, () -> count);
 	}
 
 	/**
@@ -203,7 +198,7 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 				.from(passageEntity).leftJoin(questionEntity)
 				.on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
 				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(passageYear),
-						passageEntity.passageName.eq(passageName), passageEntity.passageUnit.in(passageUnitGroup))
+						passageEntity.passageName.eq(passageName),  passageEntity.passageUnit.in(passageUnitGroup))
 				.groupBy(passageEntity.passageUnit, passageEntity.passageNumber).fetch();
 	}
 

@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.flower.blooming.dto.in.MakeExamParam;
 import kr.co.flower.blooming.dto.in.QuestionTypeParam;
+import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.service.ExamService;
 import lombok.RequiredArgsConstructor;
 
@@ -56,14 +57,35 @@ public class ExamController {
             @RequestParam(required = false) String examTitle) {
         return ResponseEntity.ok(examService.findExamList(pageable, examTitle));
     }
-    
-    // TODO 시험지에 있는 문제들 불러오기
+
     @ApiResponses({@ApiResponse(responseCode = "404", description = "시험지를 찾을 수 없습니다.")})
     @Operation(description = "시험지에 있는 문제들 불러오기", summary = "[시험지] 시험지에 있는 문제들 불러오기")
     @GetMapping(path = "/load/{examId}")
     public ResponseEntity<?> loadExam(@PathVariable(name = "examId") long examId) {
         return ResponseEntity.ok(examService.loadExam(examId));
     }
-    
+
+
+    @Operation(description = "연도, 교재, 강 검색조건에 따라 조회",
+            summary = "[시험지] 강, 지문 번호 조회 - 출제된 문제가 있는것만 조회")
+    @GetMapping(path = "/search/passage-numbers")
+    public ResponseEntity<?> searchPassageNumbers(
+            Pageable pageable, PassageType passageType, String passageYear, String passageName) {
+        return ResponseEntity.ok(
+                examService.searchPassageNumbersHavingQuestion(pageable, passageType, passageYear, passageName));
+    }
+
+    @Operation(description = "지문 유형과 연도에 해당되는 교재명 목록 조회",
+            summary = "[시험지] 지문 유형과 연도에 해당되는 교재명 목록 조회 - 출제된 문제가 있는것만 조회")
+    @GetMapping(path = "/search/passage-names")
+    public ResponseEntity<?> searchPassageNameByTypeAndYear(PassageType passageType,
+            String year) {
+        return ResponseEntity
+                .ok(examService.searchPassageNameHavingQuestion(passageType, year));
+    }
+
+
     // TODO 시험지 답안 불러오기
+
+
 }
