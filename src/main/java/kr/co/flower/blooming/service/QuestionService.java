@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -204,9 +204,9 @@ public class QuestionService {
 		}
 
 		groupByUnitPageDto.setList(byUnitDtos);
-		
+
 		int unitNum = groupByUnit.keySet().size();
-		int pageSize= unitNum / pageable.getPageSize() + 1;
+		int pageSize = unitNum / pageable.getPageSize() + 1;
 		groupByUnitPageDto.setPageSize(pageSize);
 
 		return groupByUnitPageDto;
@@ -275,6 +275,15 @@ public class QuestionService {
 		}
 
 		return questions;
+	}
+
+	/**
+	 * questionId에 해당하는 데이터 전부 조회
+	 * @param questionIds
+	 * @return
+	 */
+	public List<QuestionEntity> getQuestionAll(List<Long> questionIds) {
+		return questionRepository.findAllById(questionIds);
 	}
 
 }
