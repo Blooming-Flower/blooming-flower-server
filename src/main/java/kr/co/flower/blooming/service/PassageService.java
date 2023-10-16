@@ -104,7 +104,7 @@ public class PassageService {
         SearchPassageDto searchPassageDto = new SearchPassageDto();
         searchPassageDto.setPassageId(passage.getPassageId());
         searchPassageDto.setPassageContent(passage.getPassageContent());
-        searchPassageDto.setQuestions(questions);
+        searchPassageDto.setQuestionInfo(questions);
 
         return searchPassageDto;
     }

@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class QuestionIdAndCountDto {
 	private long passageId;
+	@Builder.Default
 	private List<Long> questionIds = new ArrayList<>();
 	private long count;
 }

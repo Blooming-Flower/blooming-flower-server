@@ -7,6 +7,7 @@ import kr.co.flower.blooming.dto.out.CheckExistPassageDto;
 import kr.co.flower.blooming.dto.out.PassageListDto;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.entity.PassageType;
+import kr.co.flower.blooming.entity.QuestionEntity;
 
 public interface PassageCustomRepository {
 
@@ -79,4 +80,7 @@ public interface PassageCustomRepository {
             String passageName,
             String passageUnit,
             String passageNumber);
+    
+    
+    
 }

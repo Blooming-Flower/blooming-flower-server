@@ -5,8 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import kr.co.flower.blooming.dto.out.ExamListDto;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
+import kr.co.flower.blooming.entity.ExamQuestionEntity;
 import kr.co.flower.blooming.entity.PassageType;
 
+/**
+ * @author shmin
+ *
+ */
 public interface ExamCustomRepository {
     /**
      * 동적 검색 쿼리, filter, order에 따라 paging
@@ -41,4 +46,11 @@ public interface ExamCustomRepository {
     List<PassageNumberAndQuestionCountDto> searchPassageNumbersHavingQuestion(Pageable pageable,
             PassageType passageType,
             String passageYear, String passageName);
+    
+    /**
+     * 해당 시험지에 맞는 question조회
+     * @param examId
+     * @return
+     */
+    List<ExamQuestionEntity> findExamQuestions(long examId);
 }

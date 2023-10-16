@@ -10,13 +10,14 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.flower.blooming.dto.out.ExamListDto;
 import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.dto.out.QExamListDto;
 import kr.co.flower.blooming.dto.out.QPassageNumberAndQuestionCountDto;
+import kr.co.flower.blooming.entity.ExamQuestionEntity;
 import kr.co.flower.blooming.entity.PassageType;
+import static kr.co.flower.blooming.entity.QExamQuestionEntity.examQuestionEntity;
 import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
 import static kr.co.flower.blooming.entity.QExamEntity.examEntity;
 import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
@@ -147,6 +148,24 @@ public class ExamCustomRepositoryImpl implements ExamCustomRepository {
                         passageEntity.passageUnit.in(passageUnitGroup))
                 .groupBy(passageEntity.passageUnit, passageEntity.passageNumber)
                 .fetch();
+    }
+    
+    /**
+     * 해당 시험지에 맞는 question조회
+     * 
+     * @param examId
+     * @return
+     */
+    @Override
+    public List<ExamQuestionEntity> findExamQuestions(long examId){
+    	return queryFactory.selectFrom(examQuestionEntity)
+    			.leftJoin(examQuestionEntity.examEntity, examEntity)
+    			.fetchJoin()
+    			.leftJoin(examQuestionEntity.questionEntity, questionEntity)
+    			.fetchJoin()
+    			.where(examQuestionEntity.examEntity.examId.eq(examId))
+				.fetch();
+				
     }
 
 }

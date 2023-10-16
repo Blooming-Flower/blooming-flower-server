@@ -1,7 +1,9 @@
 package kr.co.flower.blooming.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
@@ -64,11 +66,11 @@ public class QuestionEntity extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
-    private List<ChooseEntity> chooseEntities = new ArrayList<>();
+    private Set<ChooseEntity> chooseEntities = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
-    private List<AnswerEntity> answerEntities = new ArrayList<>();
+    private Set<AnswerEntity> answerEntities = new HashSet<>();
 
     public void setChooseEntities(List<ChooseParam> chooseDtos) {
         List<ChooseEntity> chooseList = chooseDtos.stream().map(dto -> {

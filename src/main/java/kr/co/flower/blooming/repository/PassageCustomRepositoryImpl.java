@@ -4,7 +4,6 @@ import static kr.co.flower.blooming.entity.QPassageEntity.passageEntity;
 import static kr.co.flower.blooming.entity.QQuestionEntity.questionEntity;
 import java.util.ArrayList;
 import java.util.List;
-import org.hibernate.annotations.Where;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

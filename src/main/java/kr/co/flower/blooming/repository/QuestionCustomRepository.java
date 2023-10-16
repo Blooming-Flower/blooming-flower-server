@@ -1,7 +1,6 @@
 package kr.co.flower.blooming.repository;
 
 import java.util.List;
-
 import kr.co.flower.blooming.entity.QuestionEntity;
 import kr.co.flower.blooming.entity.QuestionType;
 
@@ -22,4 +21,12 @@ public interface QuestionCustomRepository {
      * @return
      */
     List<QuestionEntity> findByQuestionCode(String questionCode);
+    
+    /**
+     * questionId에 해당하는 문제 전부 초기화
+     * 
+     * @param ids
+     * @return
+     */
+    List<QuestionEntity> findAllByIds(List<Long> questionIds);
 }
