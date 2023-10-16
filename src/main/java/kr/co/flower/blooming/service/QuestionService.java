@@ -277,13 +277,4 @@ public class QuestionService {
 		return questions;
 	}
 
-	/**
-	 * questionId에 해당하는 데이터 전부 조회
-	 * @param questionIds
-	 * @return
-	 */
-	public List<QuestionEntity> getQuestionAll(List<Long> questionIds) {
-		return questionRepository.findAllById(questionIds);
-	}
-
 }

@@ -1,5 +1,6 @@
 package kr.co.flower.blooming.controller;
 
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -84,7 +85,12 @@ public class ExamController {
                 .ok(examService.searchPassageNameHavingQuestion(passageType, year));
     }
 
-
+    @Operation(description = "문제(발문, 지문, 선지, 답) 조회", summary = "[문제 출제] 문제(발문, 지문, 선지, 답) 조회")
+    @GetMapping(path = "/search/questions/{questionIds}")
+    public ResponseEntity<?> searchQuestions(@PathVariable(name = "questionIds") List<Long> questionIds) {
+        return ResponseEntity.ok(examService.getQuestionAll(questionIds));
+    }
+    
     // TODO 시험지 답안 불러오기
 
 

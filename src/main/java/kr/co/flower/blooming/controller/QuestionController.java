@@ -75,12 +75,4 @@ public class QuestionController {
 	public ResponseEntity<?> searchPassageNameByTypeAndYear(PassageType passageType, String year) {
 		return ResponseEntity.ok(questionService.searchPassageNameByTypeAndYear(passageType, year));
 	}
-
-	@Operation(description = "문제(발문, 지문, 선지, 답) 조회", summary = "[문제 출제] 문제(발문, 지문, 선지, 답) 조회")
-	@GetMapping(path = "/search/questions/{questionIds}")
-	public ResponseEntity<?> searchQuestions(@PathVariable(name = "questionIds") List<Long> questionIds) {
-		return ResponseEntity.ok(questionService.getQuestionAll(questionIds));
-	}
-	
-	
 }
