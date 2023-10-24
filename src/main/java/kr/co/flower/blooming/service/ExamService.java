@@ -162,7 +162,7 @@ public class ExamService {
 
 			ExamPageGroupDto examPageGroupDto = new ExamPageGroupDto();
 			examPageGroupDto.setGroupName(questionGroup.get(seq).get(0).getGroupName());
-			examPageGroupDto.setQuestions(questions);
+			examPageGroupDto.setQuestionInfo(questions);
 			examQuestions.add(examPageGroupDto);
 		}
 

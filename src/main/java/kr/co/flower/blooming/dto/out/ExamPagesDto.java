@@ -34,6 +34,6 @@ public class ExamPagesDto {
     public static class ExamPageGroupDto {
         private String groupName;
         // 문제 list
-        private List<SearchQuestionDtos> questions = new ArrayList<>();
+        private List<SearchQuestionDtos> questionInfo = new ArrayList<>();
     }
 }
