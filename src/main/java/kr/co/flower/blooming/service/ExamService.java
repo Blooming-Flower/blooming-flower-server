@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import kr.co.flower.blooming.dto.in.ExamTitleChangeParam;
 import kr.co.flower.blooming.dto.in.MakeExamParam;
 import kr.co.flower.blooming.dto.in.QuestionTypeParam;
 import kr.co.flower.blooming.dto.out.ExamListDto;
@@ -253,5 +254,18 @@ public class ExamService {
 
 					return questionInfo;
 				}).collect(Collectors.toList());
+	}
+	
+	/**
+	 * 시험지 title 변경
+	 * 
+	 * @param examTitleChangeParam
+	 */
+	@Transactional
+	public void changeTitle(ExamTitleChangeParam examTitleChangeParam) {
+        ExamEntity examEntity = examRepository.findById(examTitleChangeParam.getExamId())
+                .orElseThrow(() -> new FlowerException(FlowerError.ENTITY_NOT_FOUND));
+        
+        examEntity.setExamTitle(examTitleChangeParam.getNewTitle());
 	}
 }

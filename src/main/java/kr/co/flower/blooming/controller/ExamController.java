@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.flower.blooming.dto.in.ExamTitleChangeParam;
 import kr.co.flower.blooming.dto.in.MakeExamParam;
 import kr.co.flower.blooming.dto.in.QuestionTypeParam;
 import kr.co.flower.blooming.entity.PassageType;
@@ -73,7 +75,8 @@ public class ExamController {
     public ResponseEntity<?> searchPassageNumbers(
             Pageable pageable, PassageType passageType, String passageYear, String passageName) {
         return ResponseEntity.ok(
-                examService.searchPassageNumbersHavingQuestion(pageable, passageType, passageYear, passageName));
+                examService.searchPassageNumbersHavingQuestion(pageable, passageType, passageYear,
+                        passageName));
     }
 
     @Operation(description = "지문 유형과 연도에 해당되는 교재명 목록 조회",
@@ -87,11 +90,18 @@ public class ExamController {
 
     @Operation(description = "문제(발문, 지문, 선지, 답) 조회", summary = "[문제 출제] 문제(발문, 지문, 선지, 답) 조회")
     @GetMapping(path = "/search/questions/{questionIds}")
-    public ResponseEntity<?> searchQuestions(@PathVariable(name = "questionIds") List<Long> questionIds) {
+    public ResponseEntity<?> searchQuestions(
+            @PathVariable(name = "questionIds") List<Long> questionIds) {
         return ResponseEntity.ok(examService.getQuestionAll(questionIds));
     }
-    
-    // TODO 시험지 답안 불러오기
+
+
+    @Operation(summary = "[시험지] title 변걍")
+    @PutMapping(path = "/change/title")
+    ResponseEntity<?> changeTitle(@RequestBody ExamTitleChangeParam examTitleChangeParam) {
+        examService.changeTitle(examTitleChangeParam);
+        return ResponseEntity.ok().build();
+    }
 
 
 }
