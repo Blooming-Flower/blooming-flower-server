@@ -55,7 +55,7 @@ public class ExamCustomRepositoryImpl implements ExamCustomRepository {
      * @return
      */
     private List<ExamListDto> getExamListDto(Pageable pageable, String examTitle) {
-        return queryFactory.select(new QExamListDto(examEntity.examTitle, examEntity.createTime))
+        return queryFactory.select(new QExamListDto(examEntity.examId, examEntity.examTitle, examEntity.createTime.stringValue()))
                 .from(examEntity)
                 .where(containsExamTitle(examTitle))
                 .limit(pageable.getPageSize())

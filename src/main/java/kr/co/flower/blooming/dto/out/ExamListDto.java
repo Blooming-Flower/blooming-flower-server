@@ -1,6 +1,5 @@
 package kr.co.flower.blooming.dto.out;
 
-import java.time.LocalDateTime;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ExamListDto {
+    private long examId;
     private String examTitle; // 시험지 제목
-    private LocalDateTime createTime; // 제작일자
+    private String createTime; // 제작일자
 
     @QueryProjection
-    public ExamListDto(String examTitle, LocalDateTime creatTime) {
+    public ExamListDto(long examId, String examTitle, String creatTime) {
+        this.examId = examId;
         this.examTitle = examTitle;
         this.createTime = creatTime;
     }
