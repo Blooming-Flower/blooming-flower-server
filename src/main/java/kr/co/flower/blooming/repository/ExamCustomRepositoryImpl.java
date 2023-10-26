@@ -60,7 +60,8 @@ public class ExamCustomRepositoryImpl implements ExamCustomRepository {
                 .where(containsExamTitle(examTitle))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
-                .orderBy(getOrderSpecifiers(pageable.getSort()).toArray(OrderSpecifier[]::new))
+                .orderBy(examEntity.examTitle.asc(), examEntity.createTime.desc())
+//                .orderBy(getOrderSpecifiers(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .fetch();
     }
 
