@@ -93,7 +93,7 @@ public class ExamCustomRepositoryImpl implements ExamCustomRepository {
      * @return
      */
     private BooleanExpression containsExamTitle(String examTitle) {
-        return examTitle != null ? examEntity.examTitle.eq(examTitle) : null;
+        return examTitle != null ? examEntity.examTitle.contains(examTitle) : null;
     }
     
     
