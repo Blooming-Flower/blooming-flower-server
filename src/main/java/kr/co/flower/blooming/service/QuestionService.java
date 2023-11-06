@@ -266,6 +266,12 @@ public class QuestionService {
 
 					return answerDto;
 				}).collect(Collectors.toList()));
+				
+				PassageEntity passageEntity = question.getPassageEntity();
+				questionDto.setPassageType(passageEntity.getPassageType());
+				questionDto.setPassageYear(passageEntity.getPassageYear());
+				questionDto.setPassageUnit(passageEntity.getPassageUnit());
+				questionDto.setPassageNumber(passageEntity.getPassageNumber());
 
 				searchQuestionDto.add(questionDto);
 			}
