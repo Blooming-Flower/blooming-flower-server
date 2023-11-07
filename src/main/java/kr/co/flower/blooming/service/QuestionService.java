@@ -272,6 +272,7 @@ public class QuestionService {
 				questionDto.setPassageYear(passageEntity.getPassageYear());
 				questionDto.setPassageUnit(passageEntity.getPassageUnit());
 				questionDto.setPassageNumber(passageEntity.getPassageNumber());
+				questionDto.setPassageName(passageEntity.getPassageName());
 
 				searchQuestionDto.add(questionDto);
 			}

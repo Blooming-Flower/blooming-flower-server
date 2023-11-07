@@ -46,6 +46,7 @@ public class SearchPassageDto {
             private String passageYear; // 연도
             private String passageUnit; // 강
             private String passageNumber; // 지문 번호
+            private String passageName; // 지문 
         }
     }
 }
