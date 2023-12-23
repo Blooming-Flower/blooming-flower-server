@@ -188,7 +188,9 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(passageYear),
 						passageEntity.passageName.eq(passageName))
 				.groupBy(passageEntity.passageUnit)
-				.orderBy(passageEntity.passageUnit.length().asc(), passageEntity.passageUnit.asc())
+				.orderBy(
+//				        passageEntity.passageUnit.length().desc(),
+				        passageEntity.passageUnit.desc())
 				.limit(pageable.getPageSize()).offset(pageable.getOffset()).fetch();
 
 		return queryFactory
@@ -198,7 +200,9 @@ public class PassageCustomRepositoryImpl implements PassageCustomRepository {
 				.on(passageEntity.passageId.eq(questionEntity.passageEntity.passageId))
 				.where(passageEntity.passageType.eq(passageType), passageEntity.passageYear.eq(passageYear),
 						passageEntity.passageName.eq(passageName),  passageEntity.passageUnit.in(passageUnitGroup))
-				.groupBy(passageEntity.passageUnit, passageEntity.passageNumber).fetch();
+				.groupBy(passageEntity.passageUnit, passageEntity.passageNumber)
+				.orderBy(passageEntity.passageUnit.desc())
+				.fetch();
 	}
 
 	/**
