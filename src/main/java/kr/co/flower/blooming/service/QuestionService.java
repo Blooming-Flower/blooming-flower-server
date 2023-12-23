@@ -1,6 +1,7 @@
 package kr.co.flower.blooming.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,6 +22,7 @@ import kr.co.flower.blooming.dto.out.PassageNumberAndQuestionCountDto;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos;
 import kr.co.flower.blooming.dto.out.SearchPassageDto.SearchQuestionDtos.SearchQuestionDto;
 import kr.co.flower.blooming.entity.AnswerDto;
+import kr.co.flower.blooming.entity.ChooseEntity;
 import kr.co.flower.blooming.entity.PassageEntity;
 import kr.co.flower.blooming.entity.PassageType;
 import kr.co.flower.blooming.entity.QuestionContentEntity;
@@ -253,7 +255,9 @@ public class QuestionService {
 				questionDto.setQuestionSubTitle(question.getQuestionSubTitle());
 				questionDto.setSubBox(question.getSubBox());
 				questionDto.setPastYn(question.isPastYn());
-				questionDto.setChoose(question.getChooseEntities().stream().map(choose -> {
+				questionDto.setChoose(question.getChooseEntities().stream()
+						.sorted(Comparator.comparing(ChooseEntity::getChooseSeq))
+						.map(choose -> {
 					ChooseDto chooseDto = new ChooseDto();
 					chooseDto.setSeq(choose.getChooseSeq());
 					chooseDto.setContent(choose.getChooseContent());
